@@ -11,6 +11,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 namespace {
@@ -18,11 +19,17 @@ namespace {
 constexpr uint16_t kPort = 5000;
 constexpr int kBacklog = 5;
 
+class PeerDisconnected : public std::runtime_error {
+public:
+    PeerDisconnected()
+        : std::runtime_error("peer disconnected")
+    {
+    }
+};
+
 void send_all(int fd, const void* data, std::size_t size)
 {
-    const auto* buffer =
-        static_cast<const uint8_t*>(data);
-
+    const auto* buffer = static_cast<const uint8_t*>(data);
     std::size_t total_sent = 0;
 
     // send()가 일부 바이트만 처리할 수 있으므로 끝까지 반복한다.
@@ -40,8 +47,7 @@ void send_all(int fd, const void* data, std::size_t size)
             }
 
             throw std::runtime_error(
-                std::string("send failed: ")
-                + std::strerror(errno)
+                std::string("send failed: ") + std::strerror(errno)
             );
         }
 
@@ -51,15 +57,11 @@ void send_all(int fd, const void* data, std::size_t size)
             );
         }
 
-        total_sent +=
-            static_cast<std::size_t>(sent);
+        total_sent += static_cast<std::size_t>(sent);
     }
 }
 
-std::vector<uint8_t> recv_exact(
-    int fd,
-    std::size_t size
-)
+std::vector<uint8_t> recv_exact(int fd, std::size_t size)
 {
     std::vector<uint8_t> buffer(size);
     std::size_t total_received = 0;
@@ -79,28 +81,27 @@ std::vector<uint8_t> recv_exact(
             }
 
             throw std::runtime_error(
-                std::string("recv failed: ")
-                + std::strerror(errno)
+                std::string("recv failed: ") + std::strerror(errno)
             );
         }
 
         if (received == 0) {
+            if (total_received == 0) {
+                throw PeerDisconnected();
+            }
+
             throw std::runtime_error(
-                "peer disconnected"
+                "peer disconnected during packet receive"
             );
         }
 
-        total_received +=
-            static_cast<std::size_t>(received);
+        total_received += static_cast<std::size_t>(received);
     }
 
     return buffer;
 }
 
-void send_packet(
-    int fd,
-    const protocol::Packet& packet
-)
+void send_packet(int fd, const protocol::Packet& packet)
 {
     std::vector<uint8_t> encoded =
         protocol::encode_packet(packet);
@@ -114,12 +115,9 @@ void send_packet(
 
 protocol::Packet receive_packet(int fd)
 {
-    // Header의 Length를 이용해 TCP stream에서 한 메시지의 경계를 구분한다.
+    // Header의 Length를 이용해 TCP stream에서 메시지 경계를 구분한다.
     std::vector<uint8_t> header =
-        recv_exact(
-            fd,
-            protocol::kHeaderSize
-        );
+        recv_exact(fd, protocol::kHeaderSize);
 
     uint32_t payload_length =
         protocol::get_payload_length(
@@ -128,10 +126,7 @@ protocol::Packet receive_packet(int fd)
         );
 
     std::vector<uint8_t> payload =
-        recv_exact(
-            fd,
-            payload_length
-        );
+        recv_exact(fd, payload_length);
 
     return protocol::decode_packet(
         header.data(),
@@ -143,16 +138,11 @@ protocol::Packet receive_packet(int fd)
 
 int create_server_socket()
 {
-    int server_fd = socket(
-        AF_INET,
-        SOCK_STREAM,
-        0
-    );
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
     if (server_fd < 0) {
         throw std::runtime_error(
-            std::string("socket failed: ")
-            + std::strerror(errno)
+            std::string("socket failed: ") + std::strerror(errno)
         );
     }
 
@@ -168,8 +158,7 @@ int create_server_socket()
         close(server_fd);
 
         throw std::runtime_error(
-            std::string("setsockopt failed: ")
-            + std::strerror(errno)
+            std::string("setsockopt failed: ") + std::strerror(errno)
         );
     }
 
@@ -177,33 +166,25 @@ int create_server_socket()
 
     address.sin_family = AF_INET;
     address.sin_port = htons(kPort);
-    address.sin_addr.s_addr =
-        htonl(INADDR_ANY);
+    address.sin_addr.s_addr = htonl(INADDR_ANY);
 
     if (bind(
             server_fd,
-            reinterpret_cast<sockaddr*>(
-                &address
-            ),
+            reinterpret_cast<sockaddr*>(&address),
             sizeof(address)) < 0) {
 
         close(server_fd);
 
         throw std::runtime_error(
-            std::string("bind failed: ")
-            + std::strerror(errno)
+            std::string("bind failed: ") + std::strerror(errno)
         );
     }
 
-    if (listen(
-            server_fd,
-            kBacklog) < 0) {
-
+    if (listen(server_fd, kBacklog) < 0) {
         close(server_fd);
 
         throw std::runtime_error(
-            std::string("listen failed: ")
-            + std::strerror(errno)
+            std::string("listen failed: ") + std::strerror(errno)
         );
     }
 
@@ -215,79 +196,127 @@ int create_server_socket()
 int main()
 {
     try {
-        int server_fd =
-            create_server_socket();
+        int server_fd = create_server_socket();
 
         std::cout
             << "Receiver listening on port "
             << kPort
             << '\n';
 
-        sockaddr_in client_address{};
+        // Reconnect 이후에도 같은 DATA의 중복 처리를 막기 위해 유지한다.
+        std::unordered_set<uint32_t> processed_sequences;
 
-        socklen_t client_address_length =
-            sizeof(client_address);
+        while (true) {
+            sockaddr_in client_address{};
+            socklen_t client_address_length =
+                sizeof(client_address);
 
-        int client_fd = accept(
-            server_fd,
-            reinterpret_cast<sockaddr*>(
-                &client_address
-            ),
-            &client_address_length
-        );
-
-        if (client_fd < 0) {
-            close(server_fd);
-
-            throw std::runtime_error(
-                std::string("accept failed: ")
-                + std::strerror(errno)
+            int client_fd = accept(
+                server_fd,
+                reinterpret_cast<sockaddr*>(&client_address),
+                &client_address_length
             );
+
+            if (client_fd < 0) {
+                if (errno == EINTR) {
+                    continue;
+                }
+
+                throw std::runtime_error(
+                    std::string("accept failed: ") + std::strerror(errno)
+                );
+            }
+
+            std::cout << "Sender connected\n";
+
+            while (true) {
+                try {
+                    protocol::Packet packet =
+                        receive_packet(client_fd);
+
+                    if (packet.type == protocol::MessageType::Data) {
+                        bool duplicate =
+                            processed_sequences.find(packet.sequence)
+                            != processed_sequences.end();
+
+                        if (!duplicate) {
+                            std::string message(
+                                packet.payload.begin(),
+                                packet.payload.end()
+                            );
+
+                            std::cout
+                                << "Received DATA"
+                                << " seq=" << packet.sequence
+                                << " payload=" << message
+                                << '\n';
+
+                            processed_sequences.insert(
+                                packet.sequence
+                            );
+                        }
+                        else {
+                            std::cout
+                                << "Duplicate DATA"
+                                << " seq=" << packet.sequence
+                                << " ignored"
+                                << '\n';
+                        }
+
+                        protocol::Packet ack{
+                            protocol::MessageType::Ack,
+                            packet.sequence,
+                            {}
+                        };
+
+                        send_packet(client_fd, ack);
+
+                        std::cout
+                            << "Sent ACK"
+                            << " seq=" << ack.sequence
+                            << '\n';
+                    }
+                    else if (
+                        packet.type == protocol::MessageType::Heartbeat) {
+
+                        std::cout
+                            << "Received HEARTBEAT"
+                            << " seq=" << packet.sequence
+                            << '\n';
+
+                        protocol::Packet heartbeat_ack{
+                            protocol::MessageType::HeartbeatAck,
+                            packet.sequence,
+                            {}
+                        };
+
+                        send_packet(
+                            client_fd,
+                            heartbeat_ack
+                        );
+
+                        std::cout
+                            << "Sent HEARTBEAT_ACK"
+                            << " seq=" << heartbeat_ack.sequence
+                            << '\n';
+                    }
+                    else {
+                        throw std::runtime_error(
+                            "unexpected packet type"
+                        );
+                    }
+                }
+                catch (const PeerDisconnected&) {
+                    std::cout << "Sender disconnected\n";
+                    break;
+                }
+            }
+
+            close(client_fd);
+
+            std::cout << "Waiting for connection\n";
         }
 
-        std::cout
-            << "Sender connected\n";
-
-        protocol::Packet packet =
-            receive_packet(client_fd);
-
-        if (packet.type
-            != protocol::MessageType::Data) {
-
-            throw std::runtime_error(
-                "expected DATA packet"
-            );
-        }
-
-        std::string message(
-            packet.payload.begin(),
-            packet.payload.end()
-        );
-
-        std::cout
-            << "Received DATA"
-            << " seq=" << packet.sequence
-            << " payload=" << message
-            << '\n';
-
-        // 받은 DATA의 sequence를 그대로 사용해 대응되는 ACK를 만든다.
-        protocol::Packet ack{
-            protocol::MessageType::Ack,
-            packet.sequence,
-            {}
-        };
-
-        send_packet(
-            client_fd,
-            ack
-        );
-
-        std::cout
-            << "Sent ACK"
-            << " seq=" << ack.sequence
-            << '\n';
-
-        close(client_fd);
         close(server_fd);
     }
     catch (const std::exception& e) {

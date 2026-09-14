@@ -2,15 +2,18 @@
 #include "../protocol/packet.hpp"
 
 #include <arpa/inet.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
 #include <cerrno>
+#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace {
@@ -18,11 +21,19 @@ namespace {
 constexpr const char* kServerIp = "127.0.0.1";
 constexpr uint16_t kServerPort = 5000;
 
+constexpr int kAckTimeoutMs = 1000;
+constexpr int kMaxRetries = 3;
+
+constexpr int kHeartbeatIntervalSec = 2;
+constexpr int kHeartbeatTimeoutMs = 1000;
+constexpr int kHeartbeatCount = 3;
+
+constexpr int kReconnectDelaySec = 2;
+constexpr int kMaxReconnectAttempts = 3;
+
 void send_all(int fd, const void* data, std::size_t size)
 {
-    const auto* buffer =
-        static_cast<const uint8_t*>(data);
-
+    const auto* buffer = static_cast<const uint8_t*>(data);
     std::size_t total_sent = 0;
 
     // send()가 일부 바이트만 처리할 수 있으므로 끝까지 반복한다.
@@ -40,8 +51,7 @@ void send_all(int fd, const void* data, std::size_t size)
             }
 
             throw std::runtime_error(
-                std::string("send failed: ")
-                + std::strerror(errno)
+                std::string("send failed: ") + std::strerror(errno)
             );
         }
 
@@ -51,15 +61,11 @@ void send_all(int fd, const void* data, std::size_t size)
             );
         }
 
-        total_sent +=
-            static_cast<std::size_t>(sent);
+        total_sent += static_cast<std::size_t>(sent);
     }
 }
 
-std::vector<uint8_t> recv_exact(
-    int fd,
-    std::size_t size
-)
+std::vector<uint8_t> recv_exact(int fd, std::size_t size)
 {
     std::vector<uint8_t> buffer(size);
     std::size_t total_received = 0;
@@ -79,8 +85,7 @@ std::vector<uint8_t> recv_exact(
             }
 
             throw std::runtime_error(
-                std::string("recv failed: ")
-                + std::strerror(errno)
+                std::string("recv failed: ") + std::strerror(errno)
             );
         }
 
@@ -90,17 +95,13 @@ std::vector<uint8_t> recv_exact(
             );
         }
 
-        total_received +=
-            static_cast<std::size_t>(received);
+        total_received += static_cast<std::size_t>(received);
     }
 
     return buffer;
 }
 
-void send_packet(
-    int fd,
-    const protocol::Packet& packet
-)
+void send_packet(int fd, const protocol::Packet& packet)
 {
     std::vector<uint8_t> encoded =
         protocol::encode_packet(packet);
@@ -114,7 +115,7 @@ void send_packet(
 
 protocol::Packet receive_packet(int fd)
 {
-    // 고정 크기 Header를 먼저 읽고 Length를 기준으로 Payload 경계를 결정한다.
+    // Header의 Length를 이용해 TCP stream에서 메시지 경계를 구분한다.
     std::vector<uint8_t> header =
         recv_exact(fd, protocol::kHeaderSize);
 
@@ -135,6 +136,66 @@ protocol::Packet receive_packet(int fd)
     );
 }
 
+bool wait_for_response(
+    int fd,
+    protocol::MessageType expected_type,
+    uint32_t expected_sequence,
+    int timeout_ms)
+{
+    pollfd pfd{};
+    pfd.fd = fd;
+    pfd.events = POLLIN;
+
+    int result;
+
+    do {
+        result = poll(&pfd, 1, timeout_ms);
+    } while (result < 0 && errno == EINTR);
+
+    if (result < 0) {
+        throw std::runtime_error(
+            std::string("poll failed: ") + std::strerror(errno)
+        );
+    }
+
+    if (result == 0) {
+        return false;
+    }
+
+    if (pfd.revents & (POLLERR | POLLNVAL)) {
+        throw std::runtime_error(
+            "connection error while waiting for response"
+        );
+    }
+
+    if (pfd.revents & POLLIN) {
+        protocol::Packet response =
+            receive_packet(fd);
+
+        if (response.type != expected_type) {
+            throw std::runtime_error(
+                "unexpected response type"
+            );
+        }
+
+        if (response.sequence != expected_sequence) {
+            throw std::runtime_error(
+                "response sequence mismatch"
+            );
+        }
+
+        return true;
+    }
+
+    if (pfd.revents & POLLHUP) {
+        throw std::runtime_error(
+            "peer disconnected"
+        );
+    }
+
+    return false;
+}
+
 int connect_to_receiver()
 {
     int fd = socket(
@@ -145,16 +206,14 @@ int connect_to_receiver()
 
     if (fd < 0) {
         throw std::runtime_error(
-            std::string("socket failed: ")
-            + std::strerror(errno)
+            std::string("socket failed: ") + std::strerror(errno)
         );
     }
 
     sockaddr_in server_address{};
 
     server_address.sin_family = AF_INET;
-    server_address.sin_port =
-        htons(kServerPort);
+    server_address.sin_port = htons(kServerPort);
 
     if (inet_pton(
             AF_INET,
@@ -170,20 +229,52 @@ int connect_to_receiver()
 
     if (connect(
             fd,
-            reinterpret_cast<sockaddr*>(
-                &server_address
-            ),
+            reinterpret_cast<sockaddr*>(&server_address),
             sizeof(server_address)) < 0) {
 
         close(fd);
 
         throw std::runtime_error(
-            std::string("connect failed: ")
-            + std::strerror(errno)
+            std::string("connect failed: ") + std::strerror(errno)
         );
     }
 
     return fd;
+}
+
+int connect_with_retry()
+{
+    for (int attempt = 1; attempt <= kMaxReconnectAttempts; ++attempt) {
+        try {
+            int fd = connect_to_receiver();
+
+            std::cout
+                << "Connected to receiver"
+                << " attempt=" << attempt
+                << '\n';
+
+            return fd;
+        }
+        catch (const std::exception& e) {
+            std::cout
+                << "Connect failed"
+                << " attempt=" << attempt
+                << " error=" << e.what()
+                << '\n';
+
+            if (attempt == kMaxReconnectAttempts) {
+                throw;
+            }
+
+            std::this_thread::sleep_for(
+                std::chrono::seconds(kReconnectDelaySec)
+            );
+        }
+    }
+
+    throw std::runtime_error(
+        "reconnect failed"
+    );
 }
 
 } // namespace
@@ -191,13 +282,9 @@ int connect_to_receiver()
 int main()
 {
     try {
-        int fd = connect_to_receiver();
+        int fd = connect_with_retry();
 
-        std::cout
-            << "Connected to receiver\n";
-
-        std::string message =
-            "hello embedded";
+        std::string message = "hello embedded";
 
         protocol::Packet data_packet{
             protocol::MessageType::Data,
@@ -208,38 +295,112 @@ int main()
             )
         };
 
-        send_packet(fd, data_packet);
+        bool acknowledged = false;
 
-        std::cout
-            << "Sent DATA"
-            << " seq=" << data_packet.sequence
-            << " payload=" << message
-            << '\n';
+        for (int attempt = 1; attempt <= kMaxRetries + 1; ++attempt) {
+            send_packet(fd, data_packet);
 
-        protocol::Packet ack =
-            receive_packet(fd);
+            std::cout
+                << "Sent DATA"
+                << " seq=" << data_packet.sequence
+                << " attempt=" << attempt
+                << " payload=" << message
+                << '\n';
 
-        if (ack.type
-            != protocol::MessageType::Ack) {
+            if (wait_for_response(
+                    fd,
+                    protocol::MessageType::Ack,
+                    data_packet.sequence,
+                    kAckTimeoutMs)) {
 
+                std::cout
+                    << "Received ACK"
+                    << " seq=" << data_packet.sequence
+                    << '\n';
+
+                acknowledged = true;
+                break;
+            }
+
+            std::cout
+                << "ACK timeout"
+                << " seq=" << data_packet.sequence
+                << '\n';
+        }
+
+        if (!acknowledged) {
             throw std::runtime_error(
-                "expected ACK packet"
+                "ACK retry limit exceeded"
             );
         }
 
-        // ACK의 sequence로 어떤 DATA에 대한 응답인지 확인한다.
-        if (ack.sequence
-            != data_packet.sequence) {
+        uint32_t heartbeat_sequence = 2;
 
-            throw std::runtime_error(
-                "ACK sequence mismatch"
+        for (int count = 1; count <= kHeartbeatCount; ++count) {
+            std::this_thread::sleep_for(
+                std::chrono::seconds(kHeartbeatIntervalSec)
             );
-        }
 
-        std::cout
-            << "Received ACK"
-            << " seq=" << ack.sequence
-            << '\n';
+            protocol::Packet heartbeat{
+                protocol::MessageType::Heartbeat,
+                heartbeat_sequence,
+                {}
+            };
+
+            send_packet(fd, heartbeat);
+
+            std::cout
+                << "Sent HEARTBEAT"
+                << " seq=" << heartbeat.sequence
+                << " count=" << count
+                << '\n';
+
+            bool heartbeat_ok = wait_for_response(
+                fd,
+                protocol::MessageType::HeartbeatAck,
+                heartbeat.sequence,
+                kHeartbeatTimeoutMs
+            );
+
+            if (!heartbeat_ok) {
+                std::cout
+                    << "HEARTBEAT timeout"
+                    << " seq=" << heartbeat.sequence
+                    << '\n';
+
+                close(fd);
+
+                std::cout << "Reconnecting...\n";
+
+                fd = connect_with_retry();
+
+                // 새 연결에서도 같은 Heartbeat로 상대 상태를 다시 확인한다.
+                send_packet(fd, heartbeat);
+
+                std::cout
+                    << "Resent HEARTBEAT"
+                    << " seq=" << heartbeat.sequence
+                    << '\n';
+
+                if (!wait_for_response(
+                        fd,
+                        protocol::MessageType::HeartbeatAck,
+                        heartbeat.sequence,
+                        kHeartbeatTimeoutMs)) {
+
+                    throw std::runtime_error(
+                        "heartbeat failed after reconnect"
+                    );
+                }
+            }
+
+            std::cout
+                << "Received HEARTBEAT_ACK"
+                << " seq=" << heartbeat.sequence
+                << '\n';
+
+            ++heartbeat_sequence;
+        }
 
         close(fd);
     }
