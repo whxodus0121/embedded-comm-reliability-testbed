@@ -29,3 +29,11 @@ add_executable(tcp_receiver
 target_link_libraries(tcp_receiver
     protocol
 )
+
+add_executable(tcp_fault_injector
+    fault_injector/tcp_proxy.cpp
+)
+
+target_link_libraries(tcp_fault_injector
+    protocol
+)
