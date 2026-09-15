@@ -7,3 +7,4 @@ build/
 *.so
 
 .DS_Store
+*:Zone.Identifier
