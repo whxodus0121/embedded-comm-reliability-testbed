@@ -732,6 +732,10 @@ CRC Validation
 ACK Packet
 ```
 
+![TCP Basic DATA / ACK](images/phase-1-tcp-basic.png)
+
+**PASS**
+
 ### 7.3 CRC 오류 검증
 
 CRC 검증이 실제로 동작하는지 확인하기 위해 테스트 과정에서 `encode_packet()`이 완료된 이후 첫 번째 Payload Byte를 임시로 변경했다.
@@ -761,6 +765,10 @@ Connected to receiver
 Sent DATA seq=1 payload=hello embedded
 Sender error: peer disconnected
 ```
+
+![CRC Corruption Detection](images/phase-1-crc-corruption.png)
+
+**PASS**
 
 검증 후 Payload 변조 코드는 제거하고 다시 정상 통신을 확인했다.
 

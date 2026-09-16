@@ -396,7 +396,13 @@ embedded-comm-test/
 ├── CMakeLists.txt
 ├── docs/
 │   ├── phase-1.md
-│   └── phase-2.md
+│   ├── phase-2.md
+│   └── images/
+│       ├── phase-1-tcp-basic.png
+│       ├── phase-1-crc-corruption.png
+│       ├── phase-2-heartbeat.png
+│       ├── phase-2-retry-duplicate.png
+│       └── phase-2-reconnect.png
 ├── protocol/
 │   ├── packet.hpp
 │   ├── codec.hpp
@@ -484,6 +490,74 @@ Waiting for connection
 ```
 
 Receiver는 하나의 Sender가 종료된 이후에도 Listening Socket을 유지하고 다음 Connection을 기다린다.
+
+---
+
+## 실행 증거
+
+### Phase 1 - TCP Binary Protocol
+
+정상 DATA / ACK 통신을 통해 Binary Protocol Encoding / Decoding, TCP Framing과 Sequence 기반 ACK가 정상적으로 동작하는 것을 확인했다.
+
+![TCP Basic DATA / ACK](docs/images/phase-1-tcp-basic.png)
+
+Encoding 이후 Payload Byte를 의도적으로 변경하여 Receiver가 손상된 Packet을 `CRC mismatch`로 거부하는 것을 확인했다.
+
+![CRC Corruption Detection](docs/images/phase-1-crc-corruption.png)
+
+### Phase 2 - ACK Timeout / Retry / Duplicate Detection
+
+첫 Application ACK를 의도적으로 누락했다.
+
+Sender는 1초 후 ACK Timeout을 감지하고 동일한 `seq=1` DATA를 재전송했다.
+
+Receiver는 Retry된 DATA를 Duplicate로 판단하여 실제 처리를 반복하지 않고 ACK만 다시 반환했다.
+
+```text
+ACK Loss
+    ↓
+ACK Timeout
+    ↓
+DATA seq=1 Retry
+    ↓
+Duplicate Detection
+    ↓
+ACK
+```
+
+![ACK Timeout Retry and Duplicate Detection](docs/images/phase-2-retry-duplicate.png)
+
+### Phase 2 - Normal Heartbeat
+
+정상 상태에서는 `HEARTBEAT seq=2,3,4`와 각각의 `HEARTBEAT_ACK`가 정상적으로 교환되는 것을 확인했다.
+
+![Normal Heartbeat](docs/images/phase-2-heartbeat.png)
+
+### Phase 2 - Heartbeat Timeout / Reconnect
+
+첫 `HEARTBEAT_ACK`를 의도적으로 누락해 Heartbeat Timeout을 발생시켰다.
+
+Sender는 기존 Connection을 종료한 뒤 새로운 TCP Connection을 생성하고 실패했던 동일 `HEARTBEAT seq=2`를 다시 전송했다.
+
+```text
+HEARTBEAT seq=2
+    ↓
+HEARTBEAT_ACK 없음
+    ↓
+Timeout
+    ↓
+Old Connection Close
+    ↓
+Reconnect
+    ↓
+HEARTBEAT seq=2 Retry
+    ↓
+HEARTBEAT_ACK
+```
+
+Reconnect 이후 `seq=3`, `seq=4`도 정상적으로 처리되는 것을 확인했다.
+
+![Heartbeat Timeout and Reconnect](docs/images/phase-2-reconnect.png)
 
 ---
 
