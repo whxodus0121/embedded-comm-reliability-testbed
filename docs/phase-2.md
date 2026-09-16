@@ -903,6 +903,10 @@ Sent ACK seq=1
 
 첫 번째 DATA는 실제 처리했지만 Retry된 동일 `seq=1` DATA는 중복으로 판단하여 다시 처리하지 않았다.
 
+![ACK Timeout Retry and Duplicate Detection](images/phase-2-retry-duplicate.png)
+
+**PASS**
+
 ---
 
 ### 7.4 정상 Heartbeat
@@ -935,6 +939,10 @@ Sent HEARTBEAT_ACK seq=4
 
 Application-level Liveness Check가 정상적으로 동작하는 것을 확인했다.
 
+![Normal Heartbeat](images/phase-2-heartbeat.png)
+
+**PASS**
+
 ---
 
 ### 7.5 Heartbeat Timeout / Reconnect
@@ -959,7 +967,7 @@ Received HEARTBEAT seq=2
 HEARTBEAT_ACK intentionally suppressed seq=2
 
 Sender disconnected
-Waiting for reconnect
+Waiting for connection
 
 Sender connected
 Received HEARTBEAT seq=2
@@ -975,6 +983,10 @@ HEARTBEAT seq=3
 HEARTBEAT seq=4
 → HEARTBEAT_ACK seq=4
 ```
+
+![Heartbeat Timeout and Reconnect](images/phase-2-reconnect.png)
+
+**PASS**
 
 검증 이후 `HEARTBEAT_ACK` 누락 테스트 코드는 제거했다.
 

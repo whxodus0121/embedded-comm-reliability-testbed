@@ -190,6 +190,20 @@ Packet Decode 시 수신된 CRC와 다시 계산한 CRC가 일치하지 않으�
 CRC mismatch
 ```
 
+---
+
+## Phase 1 Validation
+
+기본 DATA / ACK 통신을 통해 Binary Protocol Encoding / Decoding, TCP Framing, Sequence 기반 ACK가 정상적으로 동작하는 것을 확인했습니다.
+
+![TCP Basic DATA / ACK](docs/images/phase-1-tcp-basic.png)
+
+Encoding 완료 이후 Payload Byte를 의도적으로 변경하여 Header의 CRC와 실제 Payload가 일치하지 않는 상황을 재현했습니다.
+
+Receiver가 손상된 Packet을 `CRC mismatch`로 거부하는 것을 확인했습니다.
+
+![CRC Corruption Detection](docs/images/phase-1-crc-corruption.png)
+
 Phase 1에서 구현한 핵심 항목:
 
 - Binary Packet Format
@@ -300,7 +314,23 @@ Same HEARTBEAT Sequence Retry
 HEARTBEAT_ACK
 ```
 
-상세 내용은 [`docs/phase-2.md`](docs/phase-2.md)에 정리했습니다.
+---
+
+## Phase 2 Validation
+
+첫 Application ACK를 의도적으로 누락하여 ACK Timeout이 발생하도록 했습니다.
+
+Sender는 동일 Sequence로 DATA를 재전송했고, Receiver는 이미 처리된 `seq=1`을 Duplicate로 판단하여 실제 처리를 반복하지 않고 ACK만 다시 반환했습니다.
+
+![ACK Timeout Retry and Duplicate Detection](docs/images/phase-2-retry-duplicate.png)
+
+또한 첫 `HEARTBEAT_ACK`를 의도적으로 누락하여 Heartbeat Timeout을 재현했습니다.
+
+Sender는 기존 TCP Connection을 종료한 뒤 새로운 Connection을 생성하고 실패했던 동일 `HEARTBEAT seq=2`를 재전송했습니다. 이후 seq=3, seq=4까지 정상적으로 통신이 이어지는 것을 확인했습니다.
+
+![Heartbeat Timeout and Reconnect](docs/images/phase-2-reconnect.png)
+
+정상 Heartbeat 교환을 포함한 상세 검증 과정은 [`docs/phase-2.md`](docs/phase-2.md)에 정리했습니다.
 
 ---
 
@@ -772,6 +802,11 @@ embedded-comm-test/
     ├── phase-4.md
     │
     └── images/
+        ├── phase-1-tcp-basic.png
+        ├── phase-1-crc-corruption.png
+        ├── phase-2-heartbeat.png
+        ├── phase-2-retry-duplicate.png
+        ├── phase-2-reconnect.png
         ├── phase-3-transparent-proxy.png
         ├── phase-3-ack-drop.png
         ├── phase-3-delay.png
