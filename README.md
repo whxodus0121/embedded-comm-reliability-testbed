@@ -103,7 +103,10 @@ embedded-comm-test/
 ├── README.md
 ├── CMakeLists.txt
 ├── docs/
-│   └── phase-1.md
+│   ├── phase-1.md
+│   └── images/
+│       ├── phase-1-tcp-basic.png
+│       └── phase-1-crc-corruption.png
 ├── protocol/
 │   ├── packet.hpp
 │   ├── codec.hpp
@@ -165,15 +168,65 @@ Received ACK seq=1
 
 ## Phase 1 검증
 
+### Normal DATA / ACK
+
+정상 DATA / ACK 통신을 통해 Binary Protocol Encoding / Decoding, TCP Framing과 Sequence 기반 ACK가 정상적으로 동작하는 것을 확인했다.
+
+```text
+Sender
+Sent DATA seq=1 payload=hello embedded
+Received ACK seq=1
+
+Receiver
+Received DATA seq=1 payload=hello embedded
+Sent ACK seq=1
+```
+
+![TCP Basic DATA / ACK](docs/images/phase-1-tcp-basic.png)
+
+**PASS**
+
+### CRC Corruption Detection
+
+CRC 오류 검증에서는 정상 Packet의 Encoding이 끝난 이후 첫 번째 Payload Byte를 의도적으로 변경했다.
+
+```text
+정상 Packet 생성
+    ↓
+CRC 계산 완료
+    ↓
+Payload Byte 변조
+    ↓
+Receiver
+    ↓
+CRC mismatch
+```
+
+Receiver:
+
+```text
+Receiver error: CRC mismatch
+```
+
+Sender는 Receiver가 손상된 Packet을 거부하고 Connection을 종료했기 때문에 다음 결과를 확인했다.
+
+```text
+Sender error: peer disconnected
+```
+
+![CRC Corruption Detection](docs/images/phase-1-crc-corruption.png)
+
+**PASS**
+
+검증용 Payload 변조 코드는 테스트 이후 제거했다.
+
+### Test Result
+
 | Scenario | 결과 |
 |---|---|
 | Normal DATA → ACK | PASS |
 | Payload CRC Corruption Detection | PASS |
 | Normal Regression | PASS |
-
-CRC 오류 검증에서는 Encoding 이후 Payload Byte를 의도적으로 변경하여 Receiver가 `CRC mismatch`로 Packet을 거부하는 것을 확인했다.
-
-검증용 변조 코드는 테스트 이후 제거했다.
 
 ---
 
