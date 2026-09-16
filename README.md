@@ -1,404 +1,217 @@
 # Embedded Communication Reliability Testbed
 
-C++ 기반 Binary Communication Protocol을 직접 설계하고, TCP 통신에서 발생할 수 있는 장애를 재현하여 Application-level Reliability를 구현·검증하는 프로젝트이다.
+C++ 기반으로 Binary Protocol을 설계하고 TCP / UDP 통신에서 발생할 수 있는 Timeout, Retry, Duplicate, Corruption, Disconnect, Out-of-order 상황을 직접 재현하고 검증하는 프로젝트입니다.
 
-단순한 Socket 송수신 구현이 아니라 다음 질문을 단계적으로 확인하는 것을 목표로 한다.
+단순한 Socket 통신 구현이 아니라 다음 질문을 직접 구현과 테스트를 통해 확인하는 것을 목표로 합니다.
 
-```text
-TCP Byte Stream에서 Application Message 경계는 어떻게 구분하는가?
-
-Binary Protocol은 어떻게 직렬화하고 검증하는가?
-
-TCP 자체의 신뢰성과 Application ACK는 어떻게 다른가?
-
-응답이 오지 않을 때 Timeout과 Retry를 어떻게 처리하는가?
-
-Retry로 동일 메시지가 다시 전달될 때 중복 처리는 어떻게 방지하는가?
-
-통신이 없는 동안 상대 Application이 정상적으로 응답 가능한지는 어떻게 확인하는가?
-
-Connection이 끊어진 경우 어떻게 감지하고 통신을 복구하는가?
-
-정상 Application 코드를 수정하지 않고 통신 장애를 어떻게 재현할 수 있는가?
-
-UDP에서는 이러한 신뢰성 처리가 어떻게 달라지는가?
-```
+- TCP Byte Stream에서 Application Message 경계를 어떻게 구분할 것인가?
+- Application이 메시지 처리 여부를 어떻게 확인할 것인가?
+- ACK가 손실되면 어떻게 복구할 것인가?
+- 재전송으로 발생하는 중복 처리를 어떻게 방지할 것인가?
+- 통신 중 연결이 끊기면 어떻게 복구할 것인가?
+- 데이터가 손상되었을 때 어떻게 감지할 것인가?
+- UDP에서는 TCP와 달리 어떤 신뢰성 기능을 Application이 직접 구현해야 하는가?
+- UDP Datagram이 순서대로 도착하지 않을 경우 어떻게 감지할 것인가?
 
 ---
 
-## 프로젝트 목표
-
-이 프로젝트의 목적은 TCP 또는 UDP 자체를 다시 구현하는 것이 아니다.
-
-Transport Layer 위에서 Application이 필요로 하는 다음 요소를 직접 구현하고 장애 상황에서 검증한다.
-
-```text
-Binary Protocol
-Serialization / Deserialization
-Message Framing
-CRC Validation
-
-Application ACK
-Timeout
-Retry
-Duplicate Detection
-
-Heartbeat
-Connection Loss Detection
-Reconnect
-
-Fault Injection
-Drop
-Delay
-Corruption
-Disconnect
-```
-
-최종적으로 TCP와 UDP에서 Application Reliability가 어떻게 달라지는지 비교하는 것을 목표로 한다.
-
----
-
-## 개발 단계
+## Development Progress
 
 | Phase | 내용 | 상태 |
 |---|---|---|
-| Phase 1 | TCP Communication & Binary Protocol | ✅ 완료 |
-| Phase 2 | Application Reliability | ✅ 완료 |
-| Phase 3 | Fault Injection | ✅ 완료 |
-| Phase 4 | UDP Reliability Extension | 예정 |
-| Phase 5 | Test & Final Integration | 예정 |
+| Phase 1 | TCP Communication & Binary Protocol | ✅ Complete |
+| Phase 2 | Application Reliability | ✅ Complete |
+| Phase 3 | Fault Injection | ✅ Complete |
+| Phase 4 | UDP Reliability Extension | ✅ Complete |
+| Phase 5 | Test & Final Integration | Planned |
 
 ---
 
 # Phase 1 - TCP Communication & Binary Protocol
 
-TCP Sender / Receiver를 구현하고 Application Binary Protocol을 설계했다.
+Phase 1에서는 TCP 통신 위에서 사용할 Application Binary Protocol을 직접 설계했습니다.
 
-초기에는 단순 문자열 통신으로 시작했다.
+TCP는 Message 단위가 아니라 Byte Stream을 제공하기 때문에 한 번의 `send()`와 한 번의 `recv()`가 동일한 Message 경계를 보장하지 않습니다.
 
-```text
-Sender
-  │
-  │ "hello"
-  ▼
-Receiver
-  │
-  │ "ack"
-  ▼
-Sender
-```
+따라서 고정 크기 Header에 Payload Length를 포함하고, Receiver가 Header를 먼저 읽은 뒤 Payload Length만큼 추가로 읽는 구조를 사용했습니다.
 
-하지만 TCP는 Message 단위가 아니라 Byte Stream을 제공하므로 다음과 같은 가정을 할 수 없다.
+Binary Protocol 형식은 다음과 같습니다.
 
 ```text
-1 send()
-=
-1 recv()
+Offset  Size  Field
+0       2     Magic
+2       1     Version
+3       1     Type
+4       4     Sequence
+8       4     Payload Length
+12      4     CRC32
+16      N     Payload
 ```
 
-따라서 고정 크기 Header에 Payload Length를 포함하는 Binary Protocol을 설계했다.
+Protocol Header 크기는 16 Byte이며 최대 Payload 크기는 1024 Byte입니다.
 
 ```text
-[Header 16 byte][Payload N byte]
+Magic        = 0xAA55
+Version      = 1
+Header Size  = 16 bytes
+Max Payload  = 1024 bytes
 ```
 
-Receiver는 먼저 Header를 읽고 Length를 확인한 뒤 필요한 Payload만큼 추가로 수신한다.
+지원 Message Type:
+
+```text
+Data         = 1
+Ack          = 2
+Heartbeat    = 3
+HeartbeatAck = 4
+```
+
+Host 환경에 따라 Byte Order가 달라지는 문제를 방지하기 위해 Multi-byte Integer는 Network Byte Order로 변환합니다.
+
+```text
+htons / htonl
+ntohs / ntohl
+```
+
+C/C++ 구조체 자체를 Socket으로 직접 전송하지 않고 명시적으로 Serialize / Deserialize하도록 구현하여 Padding, Alignment, Endianness 문제를 피했습니다.
+
+또한 CRC32를 사용해 Packet 손상을 검증합니다.
+
+CRC 계산에는 다음 Field가 포함됩니다.
+
+```text
+Magic
+Version
+Type
+Sequence
+Payload Length
+Payload
+```
+
+CRC Field 자체는 CRC 계산에서 제외됩니다.
+
+TCP Receiver에서는 먼저 16 Byte Header를 정확히 읽고 Payload Length를 확인한 뒤 해당 크기만큼 Payload를 추가로 수신합니다.
 
 ```text
 TCP Byte Stream
-      ↓
-Header 16 byte 수신
-      ↓
+        ↓
+16 Byte Header
+        ↓
 Payload Length 확인
-      ↓
-Payload N byte 수신
-      ↓
-Packet Decode
+        ↓
+Payload Length만큼 추가 수신
+        ↓
+Packet Decode / CRC 검증
 ```
 
-Phase 1에서 구현한 주요 기능:
+Phase 1을 통해 Binary Protocol Encoding / Decoding, TCP Framing, Network Byte Order, CRC32 검증을 구현했습니다.
 
-- TCP Client / Server
-- Partial Send 처리
-- Partial Receive 처리
-- Length 기반 Message Framing
-- Binary Serialization / Deserialization
-- Network Byte Order
-- Sequence Number
-- CRC32 Validation
-
-CRC 검증에서는 Encoding 이후 Payload를 의도적으로 변경하여 Receiver에서 `CRC mismatch`가 발생하는 것을 확인했다.
-
-상세 내용:
-
-```text
-docs/phase-1.md
-```
+상세 내용은 [`docs/phase-1.md`](docs/phase-1.md)에 정리했습니다.
 
 ---
 
 # Phase 2 - Application Reliability
 
-Phase 1의 Binary Protocol 위에 Application-level Reliability를 추가했다.
+Phase 2에서는 TCP Transport가 제공하는 신뢰성과 별도로 Application Message 처리 여부를 확인할 수 있도록 ACK / Timeout / Retry 구조를 구현했습니다.
 
-TCP 자체에서도 ACK와 재전송을 사용하지만, 이는 Receiver Application이 실제 DATA를 처리했다는 의미와는 다르다.
+TCP 자체에도 ACK와 재전송 기능이 존재하지만 이는 TCP Byte Stream 전달을 위한 Transport Layer 기능입니다.
 
-따라서 별도의 Application ACK를 사용한다.
-
-```text
-Sender
-  │
-  │ DATA seq=1
-  ▼
-Receiver Application
-  │
-  │ DATA 처리
-  │
-  │ ACK seq=1
-  ▼
-Sender
-```
-
-## ACK Timeout / Retry
-
-Sender는 DATA 전송 후 무한정 응답을 기다리지 않고 `poll()`을 사용해 제한 시간 동안 ACK를 기다린다.
+이 프로젝트에서 사용하는 `MessageType::Ack`는 Receiver Application이 특정 Sequence의 DATA를 수신하고 처리했다는 것을 확인하기 위한 별도의 Application Layer ACK입니다.
 
 ```text
-DATA
- ↓
-ACK 대기
- │
- ├─ ACK 수신
- │    ↓
- │  정상 완료
- │
- └─ Timeout
-      ↓
-    Retry
+Sender                              Receiver
+
+DATA seq=1  ----------------------->
+
+                     Application 처리
+
+            <----------------------- ACK seq=1
 ```
 
-현재 정책:
+Sender는 ACK를 일정 시간 기다립니다.
 
 ```text
-ACK Timeout : 1000 ms
-Max Retry   : 3회
+ACK Timeout = 1000 ms
+Max Retry   = 3
 ```
 
-최초 전송까지 포함하면 최대 4회 전송한다.
+초기 전송 1회와 추가 Retry 최대 3회를 허용하므로 최대 전송 횟수는 4회입니다.
 
-Retry 시에는 새로운 Sequence를 사용하지 않고 동일 Sequence를 유지한다.
+Retry가 발생해도 동일한 논리 Message에는 동일한 Sequence를 사용합니다.
 
 ```text
-Attempt 1 → DATA seq=1
-Attempt 2 → DATA seq=1
-Attempt 3 → DATA seq=1
-Attempt 4 → DATA seq=1
-```
-
----
-
-## Duplicate Detection
-
-ACK가 Sender까지 전달되지 않았더라도 Receiver에서는 DATA 처리가 이미 완료되었을 수 있다.
-
-```text
-Sender                 Receiver
-
-DATA seq=1 ──────────> 처리 완료
-                         │
-                         └─ ACK seq=1
-                              X
-                           응답 유실
-```
-
-Sender는 Timeout 후 같은 DATA를 다시 보낸다.
-
-```text
-DATA seq=1 Retry
-```
-
-Receiver는 처리한 Sequence를 기록하여 동일 Sequence의 DATA를 다시 처리하지 않는다.
-
-```text
-처음 seq=1
-→ 실제 처리
-→ Sequence 저장
-
-다시 seq=1
-→ Duplicate
-→ 재처리하지 않음
-→ ACK만 재전송
-```
-
-현재는 다음 자료구조를 사용한다.
-
-```cpp
-std::unordered_set<uint32_t> processed_sequences;
-```
-
----
-
-## Heartbeat
-
-Application Traffic이 없는 상태에서도 상대가 실제로 응답 가능한 상태인지 확인하기 위해 Heartbeat를 추가했다.
-
-```text
-Sender
-  │
-  │ HEARTBEAT seq=N
-  ▼
-Receiver
-  │
-  │ HEARTBEAT_ACK seq=N
-  ▼
-Sender
-```
-
-`ACK`와 `HEARTBEAT_ACK`는 의미를 구분한다.
-
-```text
-ACK
-= DATA가 Application에서 처리되었음을 확인
-
-HEARTBEAT_ACK
-= 상대 Application이 현재 요청에 응답 가능한 상태임을 확인
-```
-
-현재 정책:
-
-```text
-Heartbeat Interval : 2 sec
-Heartbeat Timeout  : 1 sec
-Heartbeat Count    : 3
-```
-
----
-
-## Reconnect
-
-Heartbeat 응답이 제한 시간 안에 도착하지 않으면 기존 Connection을 더 이상 정상적인 통신 경로로 신뢰하지 않는다.
-
-```text
-HEARTBEAT
-    ↓
+DATA seq=1 attempt=1
+        ↓
 Timeout
-    ↓
-기존 Socket 종료
-    ↓
-새 Socket 생성
-    ↓
-connect()
-    ↓
-동일 HEARTBEAT 재전송
+        ↓
+DATA seq=1 attempt=2
 ```
 
-Reconnect는 기존 TCP Connection을 되살리는 것이 아니라 새로운 TCP Connection을 생성하는 과정이다.
-
-현재 정책:
+Receiver는 이미 처리한 Sequence를 기록하고 동일한 Sequence가 다시 전달되면 실제 처리를 반복하지 않습니다.
 
 ```text
-Reconnect Delay        : 2 sec
-Max Reconnect Attempts : 3
+First DATA seq=1
+→ 처리
+→ Sequence 기록
+
+Retry DATA seq=1
+→ Duplicate 감지
+→ 처리 생략
+→ ACK 재전송
 ```
 
-상세 내용:
+또한 연결 상태 확인을 위해 Heartbeat / HeartbeatAck를 추가했습니다.
 
 ```text
-docs/phase-2.md
+HEARTBEAT seq=N
+       ↓
+HEARTBEAT_ACK seq=N
 ```
+
+Heartbeat가 실패하거나 TCP Connection이 끊어진 경우 기존 Socket을 닫고 새로운 TCP Connection을 생성하여 다시 연결하도록 구현했습니다.
+
+```text
+Connection Lost
+      ↓
+Old Socket Close
+      ↓
+New TCP Connection
+      ↓
+Same Heartbeat Retry
+      ↓
+Recovery
+```
+
+상세 내용은 [`docs/phase-2.md`](docs/phase-2.md)에 정리했습니다.
 
 ---
 
 # Phase 3 - Fault Injection
 
-Phase 2에서는 ACK 누락이나 Heartbeat 응답 누락을 테스트하기 위해 Receiver 코드를 임시로 수정했다.
+Phase 3에서는 정상적인 localhost 통신만으로는 재현하기 어려운 장애 상황을 통제된 환경에서 반복적으로 검증하기 위해 Protocol-aware TCP Fault Injector를 구현했습니다.
 
-Phase 3에서는 정상 Sender / Receiver 코드를 유지한 채 통신 장애를 재현할 수 있도록 별도의 Fault Injector를 추가했다.
-
-현재 시스템 구조:
+전체 구조는 다음과 같습니다.
 
 ```text
-Sender
-127.0.0.1:5000
-      │
-      ▼
-┌─────────────────────┐
-│    Fault Injector   │
-│                     │
-│ Server :5000        │
-│      ↓              │
-│ Protocol Decode     │
-│      ↓              │
-│ Fault Injection     │
-│      ↓              │
-│ Packet Relay        │
-│      ↓              │
-│ Client              │
-└─────────┬───────────┘
-          │
-          │ 127.0.0.1:5001
-          ▼
-       Receiver
+TCP Sender                Fault Injector                TCP Receiver
+
+connect :5000  ------->   listen :5000
+                               |
+                               | TCP connection
+                               v
+                          Receiver :5001
 ```
 
-Fault Injector는 Sender에 대해서는 TCP Server, Receiver에 대해서는 TCP Client 역할을 한다.
-
-따라서 실제로는 두 개의 TCP Connection이 존재한다.
+하나의 TCP Connection 중간에 Injector를 삽입한 것이 아니라 실제로는 두 개의 TCP Connection으로 구성됩니다.
 
 ```text
-Connection #1
-
-Sender ←────────────→ Fault Injector
-
-
-Connection #2
-
-Fault Injector ←────→ Receiver
+Sender ↔ Fault Injector
+Fault Injector ↔ Receiver
 ```
 
----
+Fault Injector는 Application Binary Protocol을 Decode하여 Message Type과 Sequence를 확인하고 선택적으로 장애를 주입합니다.
 
-## Protocol-aware Proxy
-
-단순 Byte Relay가 아니라 Phase 1에서 만든 Binary Protocol을 Decode하여 Message Type과 Sequence를 확인한다.
-
-```text
-TCP Byte Stream
-      ↓
-Header / Payload 수신
-      ↓
-decode_packet()
-      ↓
-Packet Type / Sequence 확인
-      ↓
-Fault 적용 여부 판단
-      ↓
-Forward
-```
-
-이를 통해 다음과 같은 선택적인 장애 주입이 가능하다.
-
-```text
-ACK
-→ Drop
-
-ACK
-→ Delay
-
-DATA
-→ Corruption
-
-HEARTBEAT
-→ Disconnect
-```
-
-Fault Injector는 `poll()`을 사용하여 Sender와 Receiver 방향의 Socket을 동시에 감시한다.
-
----
-
-## Fault Modes
-
-현재 하나의 실행파일에서 다음 Mode를 지원한다.
+지원 Fault Mode:
 
 ```text
 none
@@ -408,7 +221,7 @@ corrupt-data
 disconnect
 ```
 
-실행 예:
+실행 예시:
 
 ```bash
 ./build/tcp_fault_injector none
@@ -420,64 +233,39 @@ disconnect
 
 ---
 
-## 3-1. Transparent Proxy
+## Transparent Proxy
 
-Fault를 적용하지 않고 모든 Packet을 정상적으로 양방향 Relay하는 것을 먼저 검증했다.
+Fault를 적용하지 않은 경우 Sender와 Receiver 사이의 DATA / ACK / HEARTBEAT을 그대로 Relay합니다.
 
-![Transparent TCP Proxy](docs/images/phase-3-transparent-proxy.png)
-
-```text
-DATA
-→ ACK
-
-HEARTBEAT
-→ HEARTBEAT_ACK
-```
-
-Fault Injector가 추가된 이후에도 기존 TCP Protocol과 Application Reliability 기능이 정상 동작했다.
-
-**Result: PASS**
+![Transparent Proxy](docs/images/phase-3-transparent-proxy.png)
 
 ---
 
-## 3-2. ACK Message Drop
+## ACK Drop
 
-Receiver가 보낸 첫 번째 ACK를 Fault Injector가 수신한 뒤 Sender에게 전달하지 않았다.
-
-![ACK Message Drop](docs/images/phase-3-ack-drop.png)
-
-실제 흐름:
+Receiver는 ACK를 정상적으로 생성하지만 Fault Injector가 첫 ACK를 전달하지 않습니다.
 
 ```text
-Sender
-  │ DATA seq=1
-  ▼
-Fault Injector
-  │
-  ▼
-Receiver
-  │
-  │ DATA 처리
-  │ ACK seq=1
-  ▼
-Fault Injector
-  X ACK DROP
+Sender                  Injector                  Receiver
 
-Sender
-  │
-  │ ACK Timeout
-  │
-  │ DATA seq=1 Retry
-  ▼
-Receiver
-  │
-  │ Duplicate DATA seq=1
-  │ 실제 처리 X
-  │ ACK seq=1
-  ▼
-Sender
+DATA seq=1  ---------->           -------------->
+                                              DATA 처리
 
-ACK 수신
+                                            ACK seq=1
+                          <------------
+
+                     X ACK Drop
+
+ACK Timeout
+
+DATA seq=1  ---------->           -------------->
+
+                                      Duplicate 감지
+
+                                            ACK seq=1
+                         <-------------  <--------
+
+Received ACK
 ```
 
 Sender:
@@ -485,7 +273,6 @@ Sender:
 ```text
 Sent DATA seq=1 attempt=1
 ACK timeout seq=1
-
 Sent DATA seq=1 attempt=2
 Received ACK seq=1
 ```
@@ -494,76 +281,44 @@ Receiver:
 
 ```text
 Received DATA seq=1
-Sent ACK seq=1
-
 Duplicate DATA seq=1 ignored
-Sent ACK seq=1
 ```
 
-이를 통해 다음 흐름을 검증했다.
-
-```text
-Application Message Drop
-→ Timeout
-→ Retry
-→ Duplicate Detection
-→ Recovery
-```
-
-**Result: PASS**
+![ACK Drop](docs/images/phase-3-ack-drop.png)
 
 ---
 
-## 3-3. ACK Delay
+## ACK Delay
 
-첫 번째 ACK를 Fault Injector에서 700ms 지연시킨 뒤 Sender에게 전달했다.
+첫 ACK를 700ms 지연시켰습니다.
 
-![ACK Delay](docs/images/phase-3-delay.png)
-
-현재 조건:
-
-```text
-Injected Delay = 700ms
-ACK Timeout    = 1000ms
-```
-
-Fault Injector:
+ACK Timeout은 1000ms이므로 Retry가 발생하지 않는 범위에서 순수한 Latency 상황을 검증했습니다.
 
 ```text
 [DELAY 700ms] ACK seq=1
-[Receiver -> Sender] ACK seq=1
 ```
 
-Sender는 Timeout 이전에 ACK를 수신했으므로 Retry하지 않았다.
-
-```text
-Sent DATA seq=1 attempt=1
-Received ACK seq=1
-```
-
-Receiver에서도 Duplicate DATA가 발생하지 않았다.
-
-```text
-Delay < Timeout
-→ 정상 ACK 처리
-→ Retry 없음
-```
-
-**Result: PASS**
+![ACK Delay](docs/images/phase-3-delay.png)
 
 ---
 
-## 3-4. DATA Corruption
+## DATA Corruption
 
-첫 DATA Packet을 정상적으로 Encoding한 뒤 Payload의 첫 Byte만 변경했다.
-
-![DATA Corruption](docs/images/phase-3-corruption.png)
-
-Fault Injector:
+DATA Packet을 Encode한 이후 첫 Payload Byte를 변경하여 기존 CRC와 실제 Payload가 일치하지 않도록 만들었습니다.
 
 ```text
-[CORRUPT] DATA seq=1
+Encode Packet
+     ↓
+CRC 계산 완료
+     ↓
+Payload Byte 변경
+     ↓
+Receiver
+     ↓
+CRC mismatch
 ```
+
+Packet을 변경한 뒤 다시 Encode하면 CRC까지 새로 계산되므로 Corruption을 감지할 수 없습니다. 따라서 Encoding 이후 실제 전송 Byte를 변경했습니다.
 
 Receiver:
 
@@ -571,265 +326,316 @@ Receiver:
 Receiver error: CRC mismatch
 ```
 
-Sender:
-
-```text
-Sender error: peer disconnected
-```
-
-Corruption은 Packet 객체의 Payload를 먼저 수정하는 방식으로 구현하지 않았다.
-
-그 경우 `encode_packet()`이 변경된 Payload 기준으로 CRC를 다시 계산하기 때문이다.
-
-실제 구현은 다음 순서로 동작한다.
-
-```text
-정상 Packet
-    ↓
-encode_packet()
-    ↓
-정상 CRC 생성
-    ↓
-Payload 첫 Byte 변경
-    ↓
-CRC는 기존 값 유지
-    ↓
-Receiver
-    ↓
-CRC mismatch
-```
-
-손상된 DATA가 Application 처리 단계까지 전달되지 않는 것을 확인했다.
-
-**Result: PASS**
+![DATA Corruption](docs/images/phase-3-corruption.png)
 
 ---
 
-## 3-5. Forced Disconnect
+## Forced Disconnect
 
-첫 Heartbeat가 Fault Injector에 도착했을 때 TCP Connection을 강제로 종료했다.
+첫 Heartbeat를 전달하기 전에 Fault Injector가 두 TCP Connection을 강제로 종료하도록 구현했습니다.
 
-![Forced Disconnect](docs/images/phase-3-disconnect.png)
-
-Fault Injector:
+Sender는 연결 종료를 감지하고 새로운 TCP Connection을 생성한 뒤 동일 Heartbeat Sequence를 다시 전송합니다.
 
 ```text
-[DISCONNECT] HEARTBEAT seq=2
-Proxy connection closed: forced disconnect injected
+HEARTBEAT seq=2
+       ↓
+Forced Disconnect
+       ↓
+Connection Lost
+       ↓
+Reconnect
+       ↓
+HEARTBEAT seq=2 Retry
+       ↓
+HEARTBEAT_ACK seq=2
 ```
 
 Sender:
 
 ```text
-Connection lost during HEARTBEAT seq=2 error=peer disconnected
+Connection lost during HEARTBEAT seq=2
 Reconnecting...
 Connected to receiver attempt=1
 Resent HEARTBEAT seq=2
 Received HEARTBEAT_ACK seq=2
 ```
 
-Receiver:
+![Forced Disconnect](docs/images/phase-3-disconnect.png)
 
-```text
-Sender disconnected
-Waiting for connection
-
-Sender connected
-Received HEARTBEAT seq=2
-Sent HEARTBEAT_ACK seq=2
-```
-
-기존 Phase 2에서는 Heartbeat Timeout만 Reconnect 대상으로 처리했다.
-
-Forced Disconnect 테스트를 통해 실제 TCP Connection Loss도 별도로 처리해야 한다는 점을 확인했고 `ConnectionLost` 예외를 추가했다.
-
-현재 Sender의 Recovery 조건은 다음과 같다.
-
-```text
-Heartbeat Timeout
-        │
-        ├──→ Reconnect
-        │
-Connection Lost
-        │
-        └──→ Reconnect
-```
-
-Reconnect 이후 실패했던 동일 `HEARTBEAT seq=2`를 다시 전송하고 정상 응답을 확인했다.
-
-이후 `seq=3`, `seq=4` Heartbeat도 정상적으로 이어졌다.
-
-**Result: PASS**
+상세 내용은 [`docs/phase-3.md`](docs/phase-3.md)에 정리했습니다.
 
 ---
 
-## Phase 3 정상 회귀 테스트
+# Phase 4 - UDP Reliability Extension
 
-모든 Fault Mode 구현 이후 `none` Mode에서 전체 정상 동작을 다시 확인했다.
+Phase 4에서는 기존 Binary Protocol을 UDP 환경으로 확장했습니다.
 
-```bash
-./build/tcp_fault_injector none
+Protocol 자체는 변경하지 않고 기존 `encode_packet()` / `decode_packet()` 및 CRC32 검증을 그대로 재사용했습니다.
+
+TCP와 UDP의 가장 큰 구현 차이 중 하나는 데이터 경계입니다.
+
+TCP는 Byte Stream이므로 Application에서 Message Framing이 필요합니다.
+
+```text
+TCP
+
+send(Packet A)
+send(Packet B)
+
+        ↓
+
+AAAAAAAABBBBBBBB...
 ```
 
-결과:
+UDP는 Datagram 경계를 유지합니다.
+
+```text
+UDP
+
+sendto(Packet A)
+sendto(Packet B)
+
+        ↓
+
+[ Datagram A ]
+[ Datagram B ]
+```
+
+따라서 UDP에서는 TCP에서 사용했던 `recv_exact()` 기반 Header / Payload Framing이 필요하지 않습니다.
+
+Receiver는 `recvfrom()`으로 하나의 Datagram을 받은 뒤 실제 Datagram 크기와 Protocol Header의 Payload Length가 일치하는지 검증합니다.
+
+반면 UDP는 다음 기능을 제공하지 않습니다.
+
+- 전달 보장
+- 자동 재전송
+- 순서 보장
+- 중복 제거
+
+따라서 필요한 신뢰성 기능을 Application에서 직접 구현했습니다.
+
+---
+
+## UDP Basic Communication
+
+UDP Sender와 Receiver는 직접 연결되며 Receiver는 Port 6000을 사용합니다.
+
+```text
+UDP Sender
+    │
+    │ DATA Datagram
+    ▼
+UDP Receiver :6000
+    │
+    │ ACK Datagram
+    ▼
+UDP Sender
+```
+
+기존 Binary Protocol을 그대로 사용하여 DATA와 ACK를 정상적으로 송수신했습니다.
+
+![UDP Basic Communication](docs/images/phase-4-udp-basic.png)
+
+---
+
+## ACK Timeout / Retry / Duplicate Detection
+
+Sender는 DATA를 전송한 뒤 `poll()`을 이용해 최대 1000ms 동안 ACK를 기다립니다.
 
 ```text
 DATA seq=1
-→ ACK seq=1
-
-HEARTBEAT seq=2
-→ HEARTBEAT_ACK seq=2
-
-HEARTBEAT seq=3
-→ HEARTBEAT_ACK seq=3
-
-HEARTBEAT seq=4
-→ HEARTBEAT_ACK seq=4
+    ↓
+ACK 대기
+    ↓
+Timeout
+    ↓
+DATA seq=1 Retry
 ```
 
-Fault Injector 및 Connection Loss Recovery 기능 추가 이후에도 기존 정상 통신이 유지되는 것을 확인했다.
+최대 Retry 횟수는 3회이며 Retry에서도 동일한 Sequence를 유지합니다.
 
-**Result: PASS**
+ACK Loss 상황을 재현하기 위해 UDP Receiver에 `drop-first-ack` Test Mode를 추가했습니다.
 
-상세 내용:
+```bash
+./build/udp_receiver drop-first-ack
+```
+
+Receiver는 첫 DATA를 정상 처리하지만 첫 ACK는 의도적으로 전송하지 않습니다.
+
+Sender:
 
 ```text
-docs/phase-3.md
+Sent DATA seq=1 attempt=1 payload=hello udp
+ACK timeout seq=1
+Sent DATA seq=1 attempt=2 payload=hello udp
+Received ACK seq=1
 ```
+
+Receiver:
+
+```text
+Received DATA seq=1 payload=hello udp
+ACK intentionally dropped seq=1
+Duplicate DATA seq=1 ignored
+Sent ACK seq=1
+```
+
+Receiver는 이미 처리한 Sequence를 기록하고 동일 Sequence가 다시 들어오면 실제 처리는 반복하지 않습니다.
+
+```text
+ACK Loss
+    ↓
+Timeout
+    ↓
+Retry
+    ↓
+Duplicate Detection
+    ↓
+ACK 재전송
+    ↓
+Recovery
+```
+
+![UDP Retry and Duplicate Detection](docs/images/phase-4-udp-retry.png)
 
 ---
 
-# Protocol Format
+## Out-of-order Detection
 
-Wire Format:
+UDP는 Datagram의 전달 순서를 보장하지 않습니다.
 
-| Offset | Size | Field |
-|---:|---:|---|
-| 0 | 2 byte | Magic |
-| 2 | 1 byte | Version |
-| 3 | 1 byte | Type |
-| 4 | 4 byte | Sequence |
-| 8 | 4 byte | Payload Length |
-| 12 | 4 byte | CRC32 |
-| 16 | N byte | Payload |
-
-Header Size:
+localhost 환경에서 실제 Packet Reordering 발생을 기다리는 방식은 재현성이 낮기 때문에 Sender에서 의도적으로 다음 순서로 DATA를 전송했습니다.
 
 ```text
-16 bytes
+1 → 3 → 2
 ```
 
-Protocol 기본값:
+실행:
+
+```bash
+./build/udp_receiver out-of-order
+./build/udp_sender out-of-order
+```
+
+Receiver는 다음에 받아야 하는 Sequence를 추적합니다.
 
 ```text
-Magic       : 0xAA55
-Version     : 1
-Max Payload : 1024 bytes
+expected_sequence = 1
 ```
 
-Message Type:
+`seq=1` 수신 후:
 
 ```text
-DATA          = 1
-ACK           = 2
-HEARTBEAT     = 3
-HEARTBEAT_ACK = 4
+expected_sequence = 2
 ```
 
-CRC32는 다음 Polynomial 기반으로 구현했다.
+인 상태에서 `seq=3`이 먼저 들어오면:
 
 ```text
-0xEDB88320
+Out-of-order DATA seq=3 expected=2
 ```
 
-CRC 계산 대상:
+를 출력합니다.
+
+실제 결과:
 
 ```text
-Magic
-Version
-Type
-Sequence
-Payload Length
-Payload
+Received DATA seq=1 payload=message-1
+Sent ACK seq=1
+
+Out-of-order DATA seq=3 expected=2
+Received DATA seq=3 payload=message-3
+Sent ACK seq=3
+
+Received DATA seq=2 payload=message-2
+Sent ACK seq=2
 ```
 
-CRC Field 자체는 CRC 계산 대상에서 제외한다.
+![UDP Out-of-order Detection](docs/images/phase-4-udp-out-of-order.png)
+
+이 테스트는 네트워크가 실제로 Datagram을 재정렬했다는 의미가 아니라 UDP 환경에서 발생할 수 있는 순서 역전 상황을 통제된 입력으로 재현하여 Detection Logic을 검증한 것입니다.
+
+이번 구현에서는 Out-of-order Detection까지만 수행하며 별도의 Reordering Buffer나 Sliding Window는 구현하지 않았습니다.
+
+상세 내용은 [`docs/phase-4.md`](docs/phase-4.md)에 정리했습니다.
+
+---
+
+# Protocol
+
+공통 Binary Protocol:
+
+```text
+┌──────────────┬─────────┬──────────────────────────────┐
+│ Offset       │ Size    │ Field                        │
+├──────────────┼─────────┼──────────────────────────────┤
+│ 0            │ 2       │ Magic                        │
+│ 2            │ 1       │ Version                      │
+│ 3            │ 1       │ Message Type                 │
+│ 4            │ 4       │ Sequence                     │
+│ 8            │ 4       │ Payload Length               │
+│ 12           │ 4       │ CRC32                        │
+│ 16           │ N       │ Payload                      │
+└──────────────┴─────────┴──────────────────────────────┘
+```
+
+TCP와 UDP 모두 동일한 Protocol Codec을 사용합니다.
+
+```text
+Application Packet
+       │
+       ▼
+encode_packet()
+       │
+       ▼
+Binary Protocol
+       │
+       ├──────── TCP
+       │
+       └──────── UDP
+```
+
+Transport가 달라져도 Application Protocol Format과 CRC 검증 로직은 공유합니다.
 
 ---
 
 # Current Architecture
 
-현재 Phase 3 기준 실행 구조는 다음과 같다.
-
 ```text
-                  Application Protocol
-                         │
-                         ▼
-┌────────────┐     ┌──────────────────┐     ┌────────────┐
-│   Sender   │     │  Fault Injector  │     │  Receiver  │
-│            │     │                  │     │            │
-│ DATA       │────>│ Decode           │────>│ DATA       │
-│ HEARTBEAT  │     │ Fault Injection  │     │            │
-│            │<────│ Packet Relay     │<────│ ACK        │
-│            │     │                  │     │ HEARTBEAT  │
-│            │     │                  │     │ ACK        │
-└────────────┘     └──────────────────┘     └────────────┘
-      │                    │                      │
-    :5000                :5000                  :5001
-```
+                         Binary Protocol
+                              │
+                 ┌────────────┴────────────┐
+                 │                         │
+                 ▼                         ▼
 
-Application Reliability:
+              TCP Path                  UDP Path
 
-```text
-DATA
-  ↓
-ACK
-  │
-  └─ 응답 없음
-       ↓
-     Timeout
-       ↓
-     Retry
-       ↓
-Duplicate Detection
-```
-
-Liveness / Recovery:
-
-```text
-HEARTBEAT
-    ↓
-HEARTBEAT_ACK
-    │
-    ├─ Timeout
-    │    ↓
-    │ Reconnect
-    │
-    └─ Connection Lost
-         ↓
-       Reconnect
+        ┌─────────────────┐        ┌─────────────────┐
+        │   TCP Sender    │        │   UDP Sender    │
+        └────────┬────────┘        └────────┬────────┘
+                 │ :5000                    │
+                 ▼                          │ Datagram
+        ┌─────────────────┐                 ▼
+        │ Fault Injector  │        ┌─────────────────┐
+        │     :5000       │        │  UDP Receiver   │
+        └────────┬────────┘        │     :6000       │
+                 │                 └─────────────────┘
+                 │ :5001
+                 ▼
+        ┌─────────────────┐
+        │  TCP Receiver   │
+        │     :5001       │
+        └─────────────────┘
 ```
 
 ---
 
-# Repository Structure
+# Project Structure
 
 ```text
 embedded-comm-test/
 ├── CMakeLists.txt
 ├── README.md
-│
-├── docs/
-│   ├── images/
-│   │   ├── phase-3-transparent-proxy.png
-│   │   ├── phase-3-ack-drop.png
-│   │   ├── phase-3-delay.png
-│   │   ├── phase-3-corruption.png
-│   │   └── phase-3-disconnect.png
-│   │
-│   ├── phase-1.md
-│   ├── phase-2.md
-│   └── phase-3.md
 │
 ├── protocol/
 │   ├── packet.hpp
@@ -842,15 +648,27 @@ embedded-comm-test/
 │   ├── sender.cpp
 │   └── receiver.cpp
 │
-└── fault_injector/
-    └── tcp_proxy.cpp
-```
-
-향후 Phase에서 다음 디렉터리를 추가할 예정이다.
-
-```text
-udp/
-tests/
+├── udp/
+│   ├── sender.cpp
+│   └── receiver.cpp
+│
+├── fault_injector/
+│   └── tcp_proxy.cpp
+│
+└── docs/
+    ├── phase-1.md
+    ├── phase-2.md
+    ├── phase-3.md
+    ├── phase-4.md
+    └── images/
+        ├── phase-3-transparent-proxy.png
+        ├── phase-3-ack-drop.png
+        ├── phase-3-delay.png
+        ├── phase-3-corruption.png
+        ├── phase-3-disconnect.png
+        ├── phase-4-udp-basic.png
+        ├── phase-4-udp-retry.png
+        └── phase-4-udp-out-of-order.png
 ```
 
 ---
@@ -862,302 +680,277 @@ cmake -S . -B build
 cmake --build build
 ```
 
-생성되는 실행파일:
+생성되는 주요 실행 파일:
 
 ```text
 build/tcp_sender
 build/tcp_receiver
 build/tcp_fault_injector
+
+build/udp_sender
+build/udp_receiver
 ```
 
 ---
 
 # Run
 
-현재 구조에서는 Receiver → Fault Injector → Sender 순서로 실행한다.
+## TCP Normal
 
-## 1. Receiver
+Receiver:
 
 ```bash
 ./build/tcp_receiver
 ```
 
-Receiver는 실제 Application Server로 `5001` Port를 사용한다.
-
-```text
-Receiver listening on port 5001
-```
-
----
-
-## 2. Fault Injector
-
-정상 Relay:
+Fault Injector:
 
 ```bash
 ./build/tcp_fault_injector none
 ```
 
-또는 원하는 Fault Mode를 선택한다.
-
-```bash
-./build/tcp_fault_injector drop-ack
-./build/tcp_fault_injector delay-ack
-./build/tcp_fault_injector corrupt-data
-./build/tcp_fault_injector disconnect
-```
-
-Fault Injector는 Sender를 위해 `5000` Port에서 대기한다.
-
----
-
-## 3. Sender
+Sender:
 
 ```bash
 ./build/tcp_sender
 ```
 
-Sender는 기존과 동일하게 `127.0.0.1:5000`으로 연결한다.
+실행 순서는 다음과 같습니다.
 
-Sender는 Fault Injector가 중간에 존재하는지 알 필요가 없다.
+```text
+TCP Receiver
+→ Fault Injector
+→ TCP Sender
+```
+
+---
+
+## TCP Fault Injection
+
+ACK Drop:
+
+```bash
+./build/tcp_fault_injector drop-ack
+```
+
+ACK Delay:
+
+```bash
+./build/tcp_fault_injector delay-ack
+```
+
+DATA Corruption:
+
+```bash
+./build/tcp_fault_injector corrupt-data
+```
+
+Forced Disconnect:
+
+```bash
+./build/tcp_fault_injector disconnect
+```
+
+각 테스트를 다시 수행하려면 Fault Injector를 재시작합니다.
+
+---
+
+## UDP Normal
+
+Receiver:
+
+```bash
+./build/udp_receiver
+```
+
+Sender:
+
+```bash
+./build/udp_sender
+```
+
+---
+
+## UDP ACK Loss / Retry
+
+Receiver:
+
+```bash
+./build/udp_receiver drop-first-ack
+```
+
+Sender:
+
+```bash
+./build/udp_sender
+```
+
+---
+
+## UDP Out-of-order
+
+Receiver:
+
+```bash
+./build/udp_receiver out-of-order
+```
+
+Sender:
+
+```bash
+./build/udp_sender out-of-order
+```
 
 ---
 
 # Test Results
 
-| Scenario | 검증 내용 | 결과 |
-|---|---|---|
-| TCP Framing | Length 기반 Packet 경계 처리 | PASS |
-| CRC Validation | 손상 Payload 검출 | PASS |
-| Application ACK | DATA 처리 완료 확인 | PASS |
-| ACK Timeout | 1초 응답 제한 | PASS |
-| Retry | 동일 Sequence 재전송 | PASS |
-| Duplicate Detection | 동일 DATA 재처리 방지 | PASS |
-| Heartbeat | Application Liveness 확인 | PASS |
-| Heartbeat Timeout | 응답 불능 상태 감지 | PASS |
-| Transparent Proxy | Proxy 경유 정상 통신 | PASS |
-| ACK Drop | Message Drop 재현 | PASS |
-| ACK Delay | 700ms 지연 재현 | PASS |
-| DATA Corruption | 중간 Payload 변조 및 CRC 검출 | PASS |
-| Forced Disconnect | 실제 TCP Connection 강제 종료 | PASS |
-| Connection Loss Detection | Sender의 연결 종료 감지 | PASS |
-| Reconnect | 새로운 TCP Connection 생성 | PASS |
-| Recovery | Reconnect 이후 통신 지속 | PASS |
-| Normal Regression | Fault 비활성 상태 정상 동작 | PASS |
+| Transport | Test | 검증 내용 | 결과 |
+|---|---|---|---|
+| TCP | Normal | Binary Protocol DATA / ACK | PASS |
+| TCP | CRC | 손상된 Payload 감지 | PASS |
+| TCP | ACK Timeout | Application ACK 미수신 감지 | PASS |
+| TCP | Retry | 동일 Sequence 재전송 | PASS |
+| TCP | Duplicate | 재전송 Message 중복 처리 방지 | PASS |
+| TCP | Heartbeat | 연결 상태 확인 | PASS |
+| TCP | Reconnect | TCP 연결 종료 후 재연결 | PASS |
+| TCP | ACK Drop | Fault Injector에서 ACK 폐기 | PASS |
+| TCP | ACK Delay | Application ACK 지연 | PASS |
+| TCP | Corruption | Encode 이후 Payload 손상 / CRC 감지 | PASS |
+| TCP | Disconnect | 강제 연결 종료 후 Recovery | PASS |
+| UDP | Basic | Datagram 기반 DATA / ACK | PASS |
+| UDP | ACK Timeout | ACK 손실 후 Timeout | PASS |
+| UDP | Retry | 동일 Sequence Datagram 재전송 | PASS |
+| UDP | Duplicate | Retry로 발생한 중복 처리 방지 | PASS |
+| UDP | Recovery | Retry 이후 ACK 수신 | PASS |
+| UDP | Out-of-order | 예상 Sequence보다 큰 Datagram 선도착 감지 | PASS |
 
 ---
 
-# 구현을 통해 확인한 내용
+# TCP vs UDP
 
-현재까지 직접 구현하고 검증한 요소는 다음과 같다.
+| 항목 | TCP | UDP |
+|---|---|---|
+| Socket Type | `SOCK_STREAM` | `SOCK_DGRAM` |
+| 통신 형태 | Connection-oriented | Connectionless |
+| 데이터 형태 | Byte Stream | Datagram |
+| Message 경계 | 보장하지 않음 | 유지 |
+| `listen()` / `accept()` | 필요 | 필요 없음 |
+| 기본 송수신 | `send()` / `recv()` | `sendto()` / `recvfrom()` |
+| Transport 전달 보장 | 제공 | 제공하지 않음 |
+| Transport 재전송 | 제공 | 제공하지 않음 |
+| 순서 보장 | 제공 | 제공하지 않음 |
+| Application ACK | 처리 확인을 위해 구현 | 전달 / 처리 확인을 위해 구현 |
+| Application Retry | Application 처리 실패 대응 | Datagram 손실 복구까지 담당 |
+| Duplicate Detection | App Retry 때문에 필요 | App Retry 때문에 필요 |
+| Framing | 직접 필요 | Datagram 경계 활용 |
+| Reconnect | 필요 | TCP와 같은 Connection 개념 없음 |
+
+TCP에서도 Application ACK를 구현한 이유는 TCP ACK가 Receiver Application의 실제 Message 처리 성공을 의미하지 않기 때문입니다.
+
+UDP에서는 Transport Layer 자체의 재전송 기능도 없으므로 Application ACK / Timeout / Retry가 데이터 손실 복구에 더 직접적으로 사용됩니다.
+
+---
+
+# Key Design Points
+
+### Binary Protocol을 직접 설계
+
+단순 문자열 송수신 대신 Header / Sequence / Length / CRC를 포함한 Binary Protocol을 구현했습니다.
+
+### Transport와 Protocol 분리
+
+TCP와 UDP 모두 동일한 `Packet`, `encode_packet()`, `decode_packet()`을 사용하도록 구성했습니다.
+
+### Sequence 기반 Reliability
+
+Sequence를 다음 목적으로 사용합니다.
 
 ```text
-Linux Socket API
+ACK Matching
+Retry Identification
+Duplicate Detection
+Out-of-order Detection
+```
 
-socket
-bind
-listen
-accept
-connect
-send
-recv
-poll
-shutdown
+### Application ACK와 TCP ACK 구분
 
-TCP Client / Server
-TCP Byte Stream
-Partial Send / Receive
+TCP 자체의 ACK와 Application Message 처리 확인용 ACK를 분리했습니다.
 
+### Controlled Fault Injection
+
+무작위 네트워크 장애에 의존하지 않고 Fault Injector와 Test Mode를 사용하여 장애 상황을 반복 가능하게 재현했습니다.
+
+### Corruption은 Encoding 이후 적용
+
+Packet을 수정한 뒤 다시 Encode하면 CRC도 새 Payload 기준으로 변경되기 때문에 실제 전송 Byte를 Encoding 이후 변경하여 CRC Error를 재현했습니다.
+
+### 최소 범위 유지
+
+통신 신뢰성의 핵심 동작을 직접 확인하는 것이 목적이므로 범위를 다음 수준으로 제한했습니다.
+
+구현 범위:
+
+```text
 Binary Protocol
-Serialization / Deserialization
-Network Byte Order
-Length-based Framing
 CRC32
-
-Sequence Number
-Application ACK
+ACK
 Timeout
 Retry
 Duplicate Detection
-
 Heartbeat
-Application-level Liveness
-Connection Loss Detection
 Reconnect
-
-TCP Proxy
-Protocol-aware Relay
-
 Fault Injection
-ACK Drop
-ACK Delay
-DATA Corruption
-Forced Disconnect
+UDP Reliability
+Out-of-order Detection
+```
+
+제외 범위:
+
+```text
+epoll
+Multi-client Server
+Thread Pool
+TLS
+MQTT
+Protocol Buffers
+Sliding Window
+Selective ACK
+Congestion Control
+Out-of-order Reordering Buffer
+RTT 기반 Dynamic Timeout
+Persistent Session ID
+Reliable UDP Protocol 전체 구현
 ```
 
 ---
 
-# 설계 과정에서 확인한 점
+# Current Limitations
 
-## TCP Reliability와 Application Reliability는 다르다
+현재 구현은 통신 신뢰성 메커니즘을 학습하고 검증하기 위한 Testbed입니다.
 
-TCP가 신뢰성 있는 Byte Stream을 제공하더라도 다음 질문까지 해결해주지는 않는다.
+TCP Receiver의 Duplicate State는 Process Memory에만 유지됩니다. 따라서 Receiver가 재시작되거나 완전히 새로운 논리 Session에서 Sequence가 다시 1부터 시작하는 경우를 구분하기 위한 Session ID 또는 Persistent Sequence는 구현하지 않았습니다.
 
-```text
-Receiver Application이 실제 DATA를 처리했는가?
+TCP Fault Injector는 테스트 목적의 단일 Thread Proxy입니다. ACK Delay 과정에서 Relay Thread가 함께 Block되므로 범용 Network Emulator가 아니라 통제된 장애 재현 도구로 사용합니다.
 
-응답이 없는 경우 얼마나 기다릴 것인가?
+UDP Receiver 역시 단일 Sender 테스트를 기준으로 구현했습니다. 여러 Sender가 동일 Sequence 공간을 사용할 경우 Sender별 Session State를 분리해야 합니다.
 
-Retry된 동일 메시지를 다시 처리할 것인가?
-
-상대 Application이 실제로 응답 가능한 상태인가?
-
-Connection이 끊어진 경우 Application은 어떻게 복구할 것인가?
-```
-
-따라서 Application 수준에서 별도의 정책이 필요했다.
-
----
-
-## Retry는 Duplicate 가능성을 만든다
-
-```text
-Timeout
-→ Retry
-```
-
-만 구현하면 동일 작업이 여러 번 수행될 수 있다.
-
-따라서:
-
-```text
-Retry
-→ Same Sequence
-→ Duplicate Detection
-```
-
-을 함께 설계했다.
-
----
-
-## Connection 존재와 Application 정상 상태는 다르다
-
-TCP Connection이 존재하더라도 Application이 정상적으로 응답한다는 보장은 없다.
-
-따라서 별도의:
-
-```text
-HEARTBEAT
-→ HEARTBEAT_ACK
-```
-
-를 사용하여 Application Liveness를 확인했다.
-
----
-
-## Timeout과 Connection Loss도 다르다
-
-Phase 3의 Forced Disconnect를 통해 다음 두 상황을 구분할 필요가 있음을 확인했다.
-
-```text
-응답은 없지만 Connection은 존재
-→ Timeout
-
-TCP Connection 자체가 종료
-→ Connection Lost
-```
-
-두 상황 모두 현재 정책에서는 Reconnect로 이어지지만 감지 방식은 다르게 구현했다.
-
----
-
-## Corruption은 Wire-format 단계에서 발생시켜야 했다
-
-Packet 객체의 Payload를 변경한 뒤 다시 Encoding하면 CRC도 함께 갱신된다.
-
-따라서 실제 데이터 손상 검증을 위해:
-
-```text
-Encoding
-→ CRC 생성
-→ Binary Payload 변경
-→ Receiver CRC mismatch
-```
-
-순서로 장애를 주입했다.
-
----
-
-# 현재 구현의 범위와 한계
-
-현재 `processed_sequences`는 Receiver Process Memory에 저장한다.
-
-따라서 Receiver Process 자체가 재시작되면 Deduplication 정보가 사라진다.
-
-또한 새로운 논리 Session에서 Sequence가 다시 `1`부터 시작할 경우 이전 Session의 Sequence와 충돌할 수 있다.
-
-이를 확장하려면 다음과 같은 요소가 필요할 수 있다.
-
-```text
-Session ID
-Persistent Deduplication State
-Sequence Scope 관리
-```
-
-현재 Fault Injector 역시 범용 Network Emulator가 아니라 프로젝트 검증을 위한 단일 Process / 단일 Connection 중심의 Test Proxy이다.
-
-특히 Delay Mode는 `sleep_for()` 동안 Relay Thread가 Block된다.
-
-이번 프로젝트에서는 Traffic Control Framework 자체를 구현하기보다, 통신 장애를 통제된 조건에서 재현하고 Reliability 정책을 검증하는 데 범위를 제한했다.
+UDP Out-of-order 테스트는 실제 Network Reordering을 측정한 것이 아니라 `1 → 3 → 2` 순서의 통제된 입력을 통해 Detection Logic을 검증한 것입니다.
 
 ---
 
 # Next Phase
 
-## Phase 4 - UDP Reliability Extension
-
-동일 Binary Protocol을 UDP로 확장한다.
-
-TCP와 달리 UDP에서는 Transport Layer가 다음 기능을 제공하지 않는다.
-
-```text
-Connection
-Reliable Delivery
-Automatic Retransmission
-Ordering
-Duplicate Prevention
-```
-
-따라서 UDP에서는 Application에서 직접 다음 기능을 구현한다.
-
-```text
-Datagram Send / Receive
-Application ACK
-Timeout
-Retry
-Duplicate Detection
-Out-of-order Detection
-```
-
-이후 TCP 구현과 비교하여 Transport 특성에 따라 Application Reliability 설계가 어떻게 달라지는지 정리한다.
-
----
-
 ## Phase 5 - Test & Final Integration
 
-마지막 Phase에서는 전체 시나리오를 통합 검증하고 다음 내용을 정리한다.
+Phase 5에서는 새로운 통신 기능을 추가하기보다 지금까지 구현한 기능을 전체적으로 검증하고 프로젝트를 마무리합니다.
 
-```text
-TCP / UDP Reliability 비교
+예정 작업:
 
-정상 통신
-Message Drop
-Delay
-Corruption
-Disconnect / Loss
-
-전체 Test Matrix
-
-최종 Architecture
-최종 README / 문서
-```
+- TCP 전체 Regression Test
+- UDP 전체 Regression Test
+- Fault Injection Scenario 최종 검증
+- Test Matrix 정리
+- TCP / UDP Reliability 비교 정리
+- 최종 Architecture 정리
+- README 및 문서 최종 점검

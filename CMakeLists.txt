@@ -37,3 +37,19 @@ add_executable(tcp_fault_injector
 target_link_libraries(tcp_fault_injector
     protocol
 )
+
+add_executable(udp_sender
+    udp/sender.cpp
+)
+
+target_link_libraries(udp_sender
+    protocol
+)
+
+add_executable(udp_receiver
+    udp/receiver.cpp
+)
+
+target_link_libraries(udp_receiver
+    protocol
+)
