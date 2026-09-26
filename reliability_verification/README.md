@@ -2,6 +2,8 @@
 
 기존 Phase 1~4는 사람이 설계한 대표 장애를 검증했다. 이 단계는 source / protocol / coverage 분석으로 가설을 만들고, **AI의 답을 결론으로 사용하지 않고** controlled reproduction과 관측 가능한 조건으로 검증한 후 원인을 수정한 기록이다.
 
+[AI Workflow — 입력, 역할 분리, 채택하지 않은 결함 후보](ai-workflow.md)
+
 ![Portfolio overview](images/portfolio-overview.svg)
 
 ## Evidence and scope

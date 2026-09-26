@@ -28,6 +28,21 @@ C++로 Binary Application Protocol을 직접 설계하고, TCP와 UDP의 전송 
 
 ---
 
+## AI-Assisted Reliability Verification — Summary
+
+사람이 설계한 Phase 1~4 장애 검증 이후, AI-assisted analysis로 기존 coverage 밖의 failure hypothesis를 만들고 실제 production binary를 사용하는 controlled experiments로 검증했습니다. AI의 제안만으로 결함이나 PASS를 판정하지 않았습니다.
+
+![Reliability verification overview](reliability_verification/images/portfolio-overview.svg)
+
+- 5개 가설 조사, **4개 main defect 재현 및 수정**
+- CASE 05는 **Contract unclear**로 확정 결함에서 제외
+- 기존 regression **8/8 PASS**, 추가 protocol/deadline guards **11/11 PASS**
+- CASE 03 After는 ACK 성공이 아닌, unsafe partial TCP connection을 폐기하는 **bounded failure**
+
+[Detailed verification](reliability_verification/README.md) · [How AI was used](reliability_verification/ai-workflow.md)
+
+---
+
 # Architecture
 
 공통 Binary Protocol을 TCP와 UDP에서 재사용하고, Transport 특성에 따라 통신 처리만 분리했습니다.
@@ -1019,6 +1034,8 @@ v1.0.0을 정식 runner로 다시 실행한 Before와 동일 입력의 After를 
 CASE 03 After는 약 1초 이내의 성공 응답이 아니라 **부분 응답 연결을 폐기하는 bounded failure**입니다. 자동 DATA reconnect를 추가한 것은 아닙니다. 정상 frame 경계의 기존 retry와 Heartbeat reconnect는 유지합니다.
 
 [상세 조사·Before/After JSON·재실행 명령·회귀 검증](reliability_verification/README.md)
+
+[AI의 역할과 판정 근거](reliability_verification/ai-workflow.md)
 
 ---
 
