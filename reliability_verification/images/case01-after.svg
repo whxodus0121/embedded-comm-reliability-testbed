@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="920" viewBox="0 0 1300 920" role="img"><title>CASE 01 | AFTER</title>
+<rect width="1300" height="920" fill="#f4f7fb"/>
+<text x="40" y="45" fill="#14243a" font-family="Arial, sans-serif" font-size="30" font-weight="700" text-anchor="start">CASE 01 | AFTER</text>
+<text x="40" y="76" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Measured run 1 | event observation order; not packet-capture micro-order</text>
+<rect x="165" y="95" width="220" height="42" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="275" y="123" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle">Sender</text>
+<line x1="275" y1="142" x2="275" y2="850" stroke="#c7d2e0" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="565" y="95" width="220" height="42" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="675" y="123" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle">Fault Injector</text>
+<line x1="675" y1="142" x2="675" y2="850" stroke="#c7d2e0" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="965" y="95" width="220" height="42" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="1075" y="123" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle">Receiver</text>
+<line x1="1075" y1="142" x2="1075" y2="850" stroke="#c7d2e0" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="20" y="175" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">27ms</text>
+<line x1="275" y1="181" x2="675" y2="181" stroke="#1769aa" stroke-width="2"/>
+<path d="M 666 176 L 675 181 L 666 186" fill="none" stroke="#1769aa" stroke-width="2"/>
+<text x="475.0" y="171" fill="#14243a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">DATA seq=1 (attempt 1)</text>
+<text x="20" y="230" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">33ms</text>
+<rect x="900" y="206" width="350" height="34" rx="12" fill="#e7eef7" stroke="#d8e2ed"/>
+<text x="1075" y="228" fill="#14243a" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle">DATA seq=1 processed</text>
+<text x="20" y="285" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">33ms</text>
+<rect x="500" y="261" width="350" height="34" rx="12" fill="#e7eef7" stroke="#d8e2ed"/>
+<text x="675" y="283" fill="#14243a" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle">[DELAY 1200ms] ACK seq=1</text>
+<text x="20" y="340" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">1028ms</text>
+<rect x="100" y="316" width="350" height="34" rx="12" fill="#e7eef7" stroke="#d8e2ed"/>
+<text x="275" y="338" fill="#14243a" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle">ACK timeout seq=1</text>
+<text x="20" y="395" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">1028ms</text>
+<line x1="275" y1="401" x2="675" y2="401" stroke="#1769aa" stroke-width="2"/>
+<path d="M 666 396 L 675 401 L 666 406" fill="none" stroke="#1769aa" stroke-width="2"/>
+<text x="475.0" y="391" fill="#14243a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">DATA seq=1 retry</text>
+<text x="20" y="450" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">1233ms</text>
+<line x1="675" y1="456" x2="275" y2="456" stroke="#1769aa" stroke-width="2"/>
+<path d="M 284 451 L 275 456 L 284 461" fill="none" stroke="#1769aa" stroke-width="2"/>
+<text x="475.0" y="446" fill="#14243a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">First delayed ACK seq=1</text>
+<text x="20" y="505" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">1233ms</text>
+<rect x="100" y="481" width="350" height="34" rx="12" fill="#e7eef7" stroke="#d8e2ed"/>
+<text x="275" y="503" fill="#14243a" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle">DATA completed</text>
+<text x="20" y="560" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">1233ms</text>
+<rect x="900" y="536" width="350" height="34" rx="12" fill="#e7eef7" stroke="#d8e2ed"/>
+<text x="1075" y="558" fill="#14243a" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle">Duplicate DATA: processing suppressed</text>
+<text x="20" y="615" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">1241ms</text>
+<line x1="675" y1="621" x2="275" y2="621" stroke="#1769aa" stroke-width="2"/>
+<path d="M 284 616 L 275 621 L 284 626" fill="none" stroke="#1769aa" stroke-width="2"/>
+<text x="475.0" y="611" fill="#14243a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">Second ACK seq=1</text>
+<text x="20" y="670" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">3234ms</text>
+<line x1="275" y1="676" x2="675" y2="676" stroke="#1769aa" stroke-width="2"/>
+<path d="M 666 671 L 675 676 L 666 681" fill="none" stroke="#1769aa" stroke-width="2"/>
+<text x="475.0" y="666" fill="#14243a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">HEARTBEAT seq=2</text>
+<text x="20" y="725" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">3234ms</text>
+<rect x="100" y="701" width="350" height="34" rx="12" fill="#e7eef7" stroke="#d8e2ed"/>
+<text x="275" y="723" fill="#14243a" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle">Ignored stale response seq=1</text>
+<text x="20" y="780" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">3234ms</text>
+<line x1="675" y1="786" x2="275" y2="786" stroke="#1769aa" stroke-width="2"/>
+<path d="M 284 781 L 275 786 L 284 791" fill="none" stroke="#1769aa" stroke-width="2"/>
+<text x="475.0" y="776" fill="#14243a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">Current HEARTBEAT_ACK seq=2</text>
+<text x="20" y="835" fill="#52657a" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">3234ms</text>
+<rect x="100" y="811" width="350" height="34" rx="12" fill="#e7eef7" stroke="#d8e2ed"/>
+<text x="275" y="833" fill="#14243a" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle">Current response accepted</text>
+<text x="40" y="894" fill="#18745a" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="start">Sender exit 0; heartbeat ACKs: [2, 3, 4]; retries: 1</text>
+</svg>

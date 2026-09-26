@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="850" viewBox="0 0 1200 850" role="img"><title>Verification evidence flow</title>
+<rect width="1200" height="850" fill="#f4f7fb"/>
+<text x="40" y="48" fill="#14243a" font-family="Arial, sans-serif" font-size="30" font-weight="700" text-anchor="start">From hypothesis to reviewable evidence</text>
+<rect x="60" y="90" width="1080" height="62" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="600" y="129" fill="#14243a" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle">Existing human-designed Phase 1-4 fault checks</text>
+<line x1="600" y1="153" x2="600" y2="179" stroke="#1769aa" stroke-width="2"/>
+<rect x="60" y="180" width="1080" height="62" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="600" y="219" fill="#14243a" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle">AI-assisted source / protocol / coverage analysis</text>
+<line x1="600" y1="243" x2="600" y2="269" stroke="#1769aa" stroke-width="2"/>
+<rect x="60" y="270" width="1080" height="62" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="600" y="309" fill="#14243a" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle">Controlled reproduction + observable assertions</text>
+<line x1="600" y1="333" x2="600" y2="359" stroke="#1769aa" stroke-width="2"/>
+<rect x="60" y="360" width="1080" height="62" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="600" y="399" fill="#14243a" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle">Classify: four defects; one contract-ambiguous candidate</text>
+<line x1="600" y1="423" x2="600" y2="449" stroke="#1769aa" stroke-width="2"/>
+<rect x="60" y="450" width="1080" height="62" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="600" y="489" fill="#14243a" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle">Root cause -&gt; minimal production fixes</text>
+<line x1="600" y1="513" x2="600" y2="539" stroke="#1769aa" stroke-width="2"/>
+<rect x="60" y="540" width="1080" height="62" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="600" y="579" fill="#14243a" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle">Same inputs -&gt; Before / After comparison</text>
+<line x1="600" y1="603" x2="600" y2="629" stroke="#1769aa" stroke-width="2"/>
+<rect x="60" y="630" width="1080" height="62" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="600" y="669" fill="#14243a" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle">Regression: 8/8; policy checks: 11/11</text>
+<line x1="600" y1="693" x2="600" y2="719" stroke="#1769aa" stroke-width="2"/>
+<rect x="60" y="720" width="1080" height="62" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="600" y="759" fill="#14243a" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle">Structured JSON -&gt; generated SVG -&gt; documented results</text>
+</svg>

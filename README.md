@@ -962,6 +962,8 @@ Sender:
 
 # Final Validation
 
+아래 표는 v1.0.0의 Phase 1~4 검증 기록입니다. 후속 reliability 변경의 새 회귀 결과는 아래 AI-Assisted Reliability Verification 문서에 분리했습니다.
+
 Phase 1~4 구현 완료 후 기존 Build 결과를 제거하고 Clean Build부터 전체 Regression Test를 다시 수행했습니다.
 
 ```bash
@@ -990,6 +992,33 @@ cmake --build build
 | UDP | Out-of-order | Sequence 순서 이상 감지 | PASS |
 
 최종 Repository 상태에서 모든 Scenario가 정상적으로 재현되는 것을 확인했습니다.
+
+---
+
+# AI-Assisted Reliability Verification
+
+Phase 1~4의 기존 대표 장애 검증 이후, source / protocol / coverage를 AI-assisted analysis로 검토하여 추가 failure hypothesis를 만들었습니다. AI의 출력을 결론으로 채택하지 않고 다음 과정을 수행했습니다.
+
+**AI-assisted hypothesis generation → controlled reproduction → deterministic validation → root cause analysis → production fix → regression verification**
+
+![Reliability verification overview](reliability_verification/images/portfolio-overview.svg)
+
+v1.0.0을 정식 runner로 다시 실행한 Before와 동일 입력의 After를 비교했습니다. 네 결함은 수정했고, UDP Receiver의 단발성 lifecycle과 ACK loss 조합은 현상이 재현됐어도 계약이 불명확하여 확정 defect와 수정 대상에서 제외했습니다.
+
+<!-- evidence-matrix:start -->
+| Case | Before | Root cause / fix | After |
+|---|---|---|---|
+| 01 Late ACK | Heartbeat failure 3/3 | Completed-response matching; one absolute deadline | Exit 0 + Heartbeat 2/3/4 3/3 |
+| 02 Partial frame | Partial EOF receiver exits: 6; zero-byte EOF controls survive | EOF stays connection-local; discard incomplete frame | Follow-up DATA/ACK 12/12 |
+| 03 Partial ACK | 3208.467, 3208.279, 3202.405 ms ACK success | Deadline-aware receive; partial connection discarded | 1001.439, 1001.531, 1001.675 ms explicit failure |
+| 04 UDP stale ACK | ACK mismatch / exit 1 3/3 | Completed-sequence history; fixed deadline | ACK 1/3/2 + exit 0 3/3 |
+<!-- evidence-matrix:end -->
+
+![Measured response deadline](reliability_verification/images/case03-timeout-before-after.svg)
+
+CASE 03 After는 약 1초 이내의 성공 응답이 아니라 **부분 응답 연결을 폐기하는 bounded failure**입니다. 자동 DATA reconnect를 추가한 것은 아닙니다. 정상 frame 경계의 기존 retry와 Heartbeat reconnect는 유지합니다.
+
+[상세 조사·Before/After JSON·재실행 명령·회귀 검증](reliability_verification/README.md)
 
 ---
 

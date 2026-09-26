@@ -1,0 +1,404 @@
+{
+  "classification": "Contract unclear",
+  "included_in_defect_count": false,
+  "runs": [
+    {
+      "sender_exit": 1,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ack_sequences": [],
+      "timeout_count": 4,
+      "retry_count": 3,
+      "duplicate_count": 0,
+      "ack3_generated": false,
+      "error": "UDP Sender error: ACK retry limit exceeded",
+      "events": [
+        {
+          "ms": 0.075,
+          "actor": "command",
+          "message": "udp_receiver_port6001"
+        },
+        {
+          "ms": 6.104,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 11.52,
+          "actor": "command",
+          "message": "udp_sender"
+        },
+        {
+          "ms": 14.836,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 14.919,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello udp"
+        },
+        {
+          "ms": 14.96,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=hello udp"
+        },
+        {
+          "ms": 15.016,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 15.068,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 16.156,
+          "actor": "relay",
+          "message": "ACK dropped; receiver exit=0"
+        },
+        {
+          "ms": 1016.049,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 1016.133,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1016.152,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=hello udp"
+        },
+        {
+          "ms": 2017.196,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 2017.304,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 2017.347,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=3 payload=hello udp"
+        },
+        {
+          "ms": 3018.357,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 3018.451,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 3018.484,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=4 payload=hello udp"
+        },
+        {
+          "ms": 4018.505,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 4018.575,
+          "actor": "udp_sender.stderr",
+          "message": "UDP Sender error: ACK retry limit exceeded"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 1,
+      "observed": true
+    },
+    {
+      "sender_exit": 1,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ack_sequences": [],
+      "timeout_count": 4,
+      "retry_count": 3,
+      "duplicate_count": 0,
+      "ack3_generated": false,
+      "error": "UDP Sender error: ACK retry limit exceeded",
+      "events": [
+        {
+          "ms": 0.153,
+          "actor": "command",
+          "message": "udp_receiver_port6001"
+        },
+        {
+          "ms": 4.202,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 12.058,
+          "actor": "command",
+          "message": "udp_sender"
+        },
+        {
+          "ms": 16.147,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello udp"
+        },
+        {
+          "ms": 16.225,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 16.396,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=hello udp"
+        },
+        {
+          "ms": 16.421,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 16.455,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 17.593,
+          "actor": "relay",
+          "message": "ACK dropped; receiver exit=0"
+        },
+        {
+          "ms": 1017.259,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 1017.286,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1017.338,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=hello udp"
+        },
+        {
+          "ms": 2018.355,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 2018.374,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=3 payload=hello udp"
+        },
+        {
+          "ms": 2018.418,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 3019.499,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 3019.516,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=4 payload=hello udp"
+        },
+        {
+          "ms": 3019.558,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 4020.695,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 4020.81,
+          "actor": "udp_sender.stderr",
+          "message": "UDP Sender error: ACK retry limit exceeded"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 2,
+      "observed": true
+    },
+    {
+      "sender_exit": 1,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ack_sequences": [],
+      "timeout_count": 4,
+      "retry_count": 3,
+      "duplicate_count": 0,
+      "ack3_generated": false,
+      "error": "UDP Sender error: ACK retry limit exceeded",
+      "events": [
+        {
+          "ms": 0.118,
+          "actor": "command",
+          "message": "udp_receiver_port6001"
+        },
+        {
+          "ms": 3.74,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 11.381,
+          "actor": "command",
+          "message": "udp_sender"
+        },
+        {
+          "ms": 14.718,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 14.78,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello udp"
+        },
+        {
+          "ms": 14.853,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=hello udp"
+        },
+        {
+          "ms": 14.9,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 14.933,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 16.041,
+          "actor": "relay",
+          "message": "ACK dropped; receiver exit=0"
+        },
+        {
+          "ms": 1015.859,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1015.915,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=hello udp"
+        },
+        {
+          "ms": 1015.967,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 2017.01,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 2017.103,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=3 payload=hello udp"
+        },
+        {
+          "ms": 2017.169,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 3018.21,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 3018.231,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=4 payload=hello udp"
+        },
+        {
+          "ms": 3018.405,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=0"
+        },
+        {
+          "ms": 4019.371,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 4019.456,
+          "actor": "udp_sender.stderr",
+          "message": "UDP Sender error: ACK retry limit exceeded"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 3,
+      "observed": true
+    }
+  ],
+  "observed": 3,
+  "total": 3
+}

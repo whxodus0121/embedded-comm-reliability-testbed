@@ -1,0 +1,59 @@
+{
+  "case01-before.svg": [
+    "case-01-late-ack/results/before-summary.json"
+  ],
+  "case01-after.svg": [
+    "case-01-late-ack/results/after-summary.json"
+  ],
+  "case02-before.svg": [
+    "case-02-partial-frame/results/before-summary.json"
+  ],
+  "case02-after.svg": [
+    "case-02-partial-frame/results/after-summary.json"
+  ],
+  "case03-timeout-before-after.svg": [
+    "case-03-partial-ack-deadline/results/before-summary.json",
+    "case-03-partial-ack-deadline/results/after-summary.json"
+  ],
+  "case04-before.svg": [
+    "case-04-udp-stale-ack/results/before-summary.json"
+  ],
+  "case04-after.svg": [
+    "case-04-udp-stale-ack/results/after-summary.json"
+  ],
+  "portfolio-overview.svg": [
+    "case-01-late-ack/results/before-summary.json",
+    "case-01-late-ack/results/after-summary.json",
+    "case-02-partial-frame/results/before-summary.json",
+    "case-02-partial-frame/results/after-summary.json",
+    "case-03-partial-ack-deadline/results/before-summary.json",
+    "case-03-partial-ack-deadline/results/after-summary.json",
+    "case-04-udp-stale-ack/results/before-summary.json",
+    "case-04-udp-stale-ack/results/after-summary.json",
+    "regression-summary.json",
+    "guard-summary.json",
+    "candidate05-summary.json"
+  ],
+  "verification-flow.svg": [
+    "case-01-late-ack/results/before-summary.json",
+    "case-01-late-ack/results/after-summary.json",
+    "case-02-partial-frame/results/before-summary.json",
+    "case-02-partial-frame/results/after-summary.json",
+    "case-03-partial-ack-deadline/results/before-summary.json",
+    "case-03-partial-ack-deadline/results/after-summary.json",
+    "case-04-udp-stale-ack/results/before-summary.json",
+    "case-04-udp-stale-ack/results/after-summary.json",
+    "regression-summary.json",
+    "guard-summary.json",
+    "candidate05-summary.json"
+  ],
+  "case01-evidence.svg": [
+    "case-01-late-ack/results/before-summary.json"
+  ],
+  "case02-evidence.svg": [
+    "case-02-partial-frame/results/before-summary.json"
+  ],
+  "case04-evidence.svg": [
+    "case-04-udp-stale-ack/results/before-summary.json"
+  ]
+}

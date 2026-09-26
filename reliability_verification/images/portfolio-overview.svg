@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="810" viewBox="0 0 1200 810" role="img"><title>AI-assisted reliability verification</title>
+<rect width="1200" height="810" fill="#f4f7fb"/>
+<text x="45" y="55" fill="#14243a" font-family="Arial, sans-serif" font-size="34" font-weight="700" text-anchor="start">Reliability verification beyond isolated faults</text>
+<text x="45" y="94" fill="#52657a" font-family="Arial, sans-serif" font-size="23" font-weight="400" text-anchor="start">AI-assisted hypotheses. Conclusions established by controlled experiments.</text>
+<rect x="45" y="140" width="355" height="135" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="65" y="173" fill="#1769aa" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">01</text>
+<text x="65" y="209" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Human-designed Phase 1-4</text>
+<text x="65" y="239" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">drop / delay / CRC / reconnect</text>
+<rect x="430" y="140" width="355" height="135" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="450" y="173" fill="#1769aa" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">02</text>
+<text x="450" y="209" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">AI-assisted analysis</text>
+<text x="450" y="239" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">source + protocol + coverage</text>
+<rect x="815" y="140" width="355" height="135" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="835" y="173" fill="#1769aa" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">03</text>
+<text x="835" y="209" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">5 hypotheses investigated</text>
+<text x="835" y="239" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">4 defect cases + 1 contract</text>
+<text x="835" y="265" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">unclear</text>
+<rect x="45" y="305" width="355" height="135" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="65" y="338" fill="#1769aa" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">04</text>
+<text x="65" y="374" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Production fixes</text>
+<text x="65" y="404" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">deadline / stale responses /</text>
+<text x="65" y="430" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">EOF</text>
+<rect x="430" y="305" width="355" height="135" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="450" y="338" fill="#1769aa" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">05</text>
+<text x="450" y="374" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Same experiments rerun</text>
+<text x="450" y="404" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Before / After: 3 runs per</text>
+<text x="450" y="430" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">condition</text>
+<rect x="815" y="305" width="355" height="135" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="835" y="338" fill="#1769aa" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">06</text>
+<text x="835" y="374" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="start">Regression verification</text>
+<text x="835" y="404" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">8/8 scenarios + 11/11 policy</text>
+<text x="835" y="430" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">checks</text>
+<text x="55" y="520" fill="#1769aa" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="start">CASE 01</text>
+<text x="185" y="520" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">Late ACK / retry -&gt; stale response</text>
+<text x="1130" y="520" fill="#18745a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="end">After: PASS</text>
+<text x="55" y="573" fill="#1769aa" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="start">CASE 02</text>
+<text x="185" y="573" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">Partial frame -&gt; Receiver exit</text>
+<text x="1130" y="573" fill="#18745a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="end">After: PASS</text>
+<text x="55" y="626" fill="#1769aa" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="start">CASE 03</text>
+<text x="185" y="626" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">Partial ACK -&gt; deadline violation</text>
+<text x="1130" y="626" fill="#18745a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="end">After: PASS</text>
+<text x="55" y="679" fill="#1769aa" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="start">CASE 04</text>
+<text x="185" y="679" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">UDP stale ACK -&gt; later request exit</text>
+<text x="1130" y="679" fill="#18745a" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="end">After: PASS</text>
+<text x="55" y="757" fill="#52657a" font-family="Arial, sans-serif" font-size="21" font-weight="400" text-anchor="start">CASE 05: ACK loss + one-shot UDP Receiver; reproduced, not counted as a defect.</text>
+<text x="55" y="788" fill="#52657a" font-family="Arial, sans-serif" font-size="20" font-weight="400" text-anchor="start">Evidence: executable tests -&gt; measured JSON -&gt; generated diagrams</text>
+</svg>

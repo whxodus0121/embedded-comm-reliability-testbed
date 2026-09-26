@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="244" viewBox="0 0 1200 244" role="img"><title>CASE 02 | Recorded evidence</title>
+<rect width="1200" height="244" fill="#f4f7fb"/>
+<text x="40" y="48" fill="#14243a" font-family="Arial, sans-serif" font-size="28" font-weight="700" text-anchor="start">CASE 02 | Recorded Before evidence</text>
+<text x="40" y="104" fill="#14243a" font-family="monospace" font-size="19" font-weight="400" text-anchor="start">Receiver error: peer disconnected during packet receive</text>
+<text x="40" y="146" fill="#14243a" font-family="monospace" font-size="19" font-weight="400" text-anchor="start">ConnectionRefusedError</text>
+<text x="40" y="219" fill="#52657a" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start">Exact selected log lines from before-summary.json, run 1</text>
+</svg>

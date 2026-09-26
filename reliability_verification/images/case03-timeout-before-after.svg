@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="660" viewBox="0 0 1200 660" role="img"><title>CASE 03 | Full response deadline</title>
+<rect width="1200" height="660" fill="#f4f7fb"/>
+<text x="40" y="48" fill="#14243a" font-family="Arial, sans-serif" font-size="30" font-weight="700" text-anchor="start">CASE 03 | Full response deadline</text>
+<text x="40" y="81" fill="#52657a" font-family="Arial, sans-serif" font-size="21" font-weight="400" text-anchor="start">Before: ACK accepted late. After: explicit failure + connection discarded.</text>
+<line x1="245.0" y1="135" x2="245.0" y2="430" stroke="#d8e2ed" stroke-width="2"/>
+<text x="245.0" y="456" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">0</text>
+<line x1="353.33333333333337" y1="135" x2="353.33333333333337" y2="430" stroke="#d8e2ed" stroke-width="2"/>
+<text x="353.33333333333337" y="456" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">500</text>
+<line x1="461.6666666666667" y1="135" x2="461.6666666666667" y2="430" stroke="#d8e2ed" stroke-width="2"/>
+<text x="461.6666666666667" y="456" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">1000</text>
+<line x1="570.0" y1="135" x2="570.0" y2="430" stroke="#d8e2ed" stroke-width="2"/>
+<text x="570.0" y="456" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">1500</text>
+<line x1="678.3333333333334" y1="135" x2="678.3333333333334" y2="430" stroke="#d8e2ed" stroke-width="2"/>
+<text x="678.3333333333334" y="456" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">2000</text>
+<line x1="786.6666666666666" y1="135" x2="786.6666666666666" y2="430" stroke="#d8e2ed" stroke-width="2"/>
+<text x="786.6666666666666" y="456" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">2500</text>
+<line x1="895.0" y1="135" x2="895.0" y2="430" stroke="#d8e2ed" stroke-width="2"/>
+<text x="895.0" y="456" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">3000</text>
+<line x1="1003.3333333333334" y1="135" x2="1003.3333333333334" y2="430" stroke="#d8e2ed" stroke-width="2"/>
+<text x="1003.3333333333334" y="456" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">3500</text>
+<text x="40" y="173" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">Before / Run 1</text>
+<rect x="245" y="150" width="695.16785" height="30" rx="12" fill="#b9403d" stroke="none"/>
+<text x="950.16785" y="173" fill="#14243a" font-family="Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">3208.467</text>
+<text x="40" y="217" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">Before / Run 2</text>
+<rect x="245" y="194" width="695.1271166666667" height="30" rx="12" fill="#b9403d" stroke="none"/>
+<text x="950.1271166666667" y="217" fill="#14243a" font-family="Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">3208.279</text>
+<text x="40" y="261" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">Before / Run 3</text>
+<rect x="245" y="238" width="693.8544166666667" height="30" rx="12" fill="#b9403d" stroke="none"/>
+<text x="948.8544166666667" y="261" fill="#14243a" font-family="Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">3202.405</text>
+<text x="40" y="323" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">After / Run 1</text>
+<rect x="245" y="300" width="216.97845" height="30" rx="12" fill="#18745a" stroke="none"/>
+<text x="471.97845" y="323" fill="#14243a" font-family="Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">1001.439</text>
+<text x="40" y="367" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">After / Run 2</text>
+<rect x="245" y="344" width="216.99838333333332" height="30" rx="12" fill="#18745a" stroke="none"/>
+<text x="471.9983833333333" y="367" fill="#14243a" font-family="Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">1001.531</text>
+<text x="40" y="411" fill="#14243a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">After / Run 3</text>
+<rect x="245" y="388" width="217.02958333333333" height="30" rx="12" fill="#18745a" stroke="none"/>
+<text x="472.02958333333333" y="411" fill="#14243a" font-family="Arial, sans-serif" font-size="19" font-weight="400" text-anchor="start">1001.675</text>
+<line x1="461.6666666666667" y1="120" x2="461.6666666666667" y2="430" stroke="#1769aa" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="461.6666666666667" y="113" fill="#1769aa" font-family="Arial, sans-serif" font-size="19" font-weight="700" text-anchor="middle">1000ms configured deadline</text>
+<text x="700" y="487" fill="#52657a" font-family="Arial, sans-serif" font-size="20" font-weight="400" text-anchor="middle">Observed response outcome (ms)</text>
+<rect x="40" y="515" width="1120" height="112" rx="12" fill="white" stroke="#d8e2ed"/>
+<text x="65" y="548" fill="#b9403d" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">No-completion case: 3/3 waiting at 6000ms before</text>
+<text x="65" y="584" fill="#18745a" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="start">After outcomes (ms): 1001.427, 1001.603, 1001.503</text>
+<text x="65" y="611" fill="#52657a" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start">Bounded fail-fast policy; this chart does not claim successful automatic DATA recovery.</text>
+</svg>
