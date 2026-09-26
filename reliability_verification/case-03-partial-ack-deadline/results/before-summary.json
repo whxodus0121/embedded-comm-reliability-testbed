@@ -1,0 +1,474 @@
+{
+  "schema_version": 1,
+  "phase": "before",
+  "configured_timeout_ms": 1000,
+  "timing_tolerance_ms": [
+    900,
+    1250
+  ],
+  "source_sha256": {
+    "tcp/receiver.cpp": "6b0566bc9c3da4a80792aa5bbb6ba1f241f6651bc449816510849b73da4db27f",
+    "tcp/sender.cpp": "4dfcc6d2c8b9867893af75ee17e883bfebe39fdf398d64bad4daf21ffed9d208",
+    "udp/receiver.cpp": "975ace94f846fb8dfc6ff55096fc99c3f348ffd063167a31c4d073c0086c8e92",
+    "udp/sender.cpp": "61d63eb7ad3ed165a6736adc1a8fc571e2143f2368e49da933ca217011443783",
+    "protocol/codec.cpp": "e99a7bd688939ce757242e89db3bc533951a53b89fd18e62f0e99381f5c6dc5b",
+    "protocol/codec.hpp": "f6af4ea8afa2958d29ce9e7f02284322790a241d1e5c7c8cdbd2ff07a0f63f7e",
+    "protocol/crc32.cpp": "00589f12e508a856935d4e9ec56605fc2feb41f60bd968f1dcca8892a3423fc9",
+    "protocol/crc32.hpp": "40bf9f606057829fc7991be11021badda245a830eb725dc52d4bc29910bfa276",
+    "protocol/packet.hpp": "906096e815f7fb95886ad78565cd153967862d73d3ad4a763ee7fc414f8c2ddf",
+    "fault_injector/tcp_proxy.cpp": "a63cda3d6ecb64484b20686c70b4c8b0a7cf1ec47f38419944ace17e8e308365"
+  },
+  "harness_sha256": "bfe462f50467491157d663f4aefbaa01e15c94600e469cfe32aa063480dde2e1",
+  "baseline_tag": "v1.0.0",
+  "repetitions": 3,
+  "case": "case-03-partial-ack-deadline",
+  "runs": [
+    {
+      "mode": "complete-late",
+      "response_outcome_ms": 3208.467,
+      "observation_limit_ms": 3200.0,
+      "natural_exit": 0,
+      "alive_at_observation_end": false,
+      "connection_discarded": false,
+      "data_ack": true,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.108,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 3.977,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 4.032,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 4.044,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 84.369,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 3212.426,
+          "actor": "peer",
+          "message": "remaining ACK bytes send attempted at 3200ms"
+        },
+        {
+          "ms": 3212.511,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 5212.762,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 5212.955,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 7213.204,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=3 count=2"
+        },
+        {
+          "ms": 7213.264,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 9213.538,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=4 count=3"
+        },
+        {
+          "ms": 9213.561,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 9214.626,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=0"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "run": 1,
+      "variant": "complete-late",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "never-complete",
+      "response_outcome_ms": null,
+      "observation_limit_ms": 6000.0,
+      "natural_exit": null,
+      "alive_at_observation_end": true,
+      "connection_discarded": false,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.083,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 4.914,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 4.986,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 5.007,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 85.174,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 6014.237,
+          "actor": "observer",
+          "message": "observation end: alive=True; natural_exit=None"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 1,
+      "variant": "never-complete",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "complete-late",
+      "response_outcome_ms": 3208.279,
+      "observation_limit_ms": 3200.0,
+      "natural_exit": 0,
+      "alive_at_observation_end": false,
+      "connection_discarded": false,
+      "data_ack": true,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.065,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 4.173,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 4.213,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 4.294,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 84.502,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 3212.408,
+          "actor": "peer",
+          "message": "remaining ACK bytes send attempted at 3200ms"
+        },
+        {
+          "ms": 3212.492,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 5212.76,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 5212.801,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 7213.195,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=3 count=2"
+        },
+        {
+          "ms": 7213.208,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 9213.582,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=4 count=3"
+        },
+        {
+          "ms": 9213.619,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 9214.714,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=0"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "run": 2,
+      "variant": "complete-late",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "never-complete",
+      "response_outcome_ms": null,
+      "observation_limit_ms": 6000.0,
+      "natural_exit": null,
+      "alive_at_observation_end": true,
+      "connection_discarded": false,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.097,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 5.284,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 5.405,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 5.44,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 85.625,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 6012.301,
+          "actor": "observer",
+          "message": "observation end: alive=True; natural_exit=None"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 2,
+      "variant": "never-complete",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "complete-late",
+      "response_outcome_ms": 3202.405,
+      "observation_limit_ms": 3200.0,
+      "natural_exit": 0,
+      "alive_at_observation_end": false,
+      "connection_discarded": false,
+      "data_ack": true,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.069,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 59.126,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 59.156,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 59.235,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 139.454,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 3261.436,
+          "actor": "peer",
+          "message": "remaining ACK bytes send attempted at 3200ms"
+        },
+        {
+          "ms": 3261.561,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 5261.886,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 5262.096,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 7262.484,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=3 count=2"
+        },
+        {
+          "ms": 7262.58,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 9262.819,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=4 count=3"
+        },
+        {
+          "ms": 9262.867,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 9264.051,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=0"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "run": 3,
+      "variant": "complete-late",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "never-complete",
+      "response_outcome_ms": null,
+      "observation_limit_ms": 6000.0,
+      "natural_exit": null,
+      "alive_at_observation_end": true,
+      "connection_discarded": false,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.149,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 4.649,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 4.709,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 4.741,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 84.872,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 6006.318,
+          "actor": "observer",
+          "message": "observation end: alive=True; natural_exit=None"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 3,
+      "variant": "never-complete",
+      "matched_expected_behavior": true
+    }
+  ],
+  "matched": 6,
+  "total": 6,
+  "verdict": "REPRODUCED"
+}

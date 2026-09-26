@@ -1,0 +1,630 @@
+{
+  "schema_version": 1,
+  "phase": "before",
+  "configured_timeout_ms": 1000,
+  "timing_tolerance_ms": [
+    900,
+    1250
+  ],
+  "source_sha256": {
+    "tcp/receiver.cpp": "6b0566bc9c3da4a80792aa5bbb6ba1f241f6651bc449816510849b73da4db27f",
+    "tcp/sender.cpp": "4dfcc6d2c8b9867893af75ee17e883bfebe39fdf398d64bad4daf21ffed9d208",
+    "udp/receiver.cpp": "975ace94f846fb8dfc6ff55096fc99c3f348ffd063167a31c4d073c0086c8e92",
+    "udp/sender.cpp": "61d63eb7ad3ed165a6736adc1a8fc571e2143f2368e49da933ca217011443783",
+    "protocol/codec.cpp": "e99a7bd688939ce757242e89db3bc533951a53b89fd18e62f0e99381f5c6dc5b",
+    "protocol/codec.hpp": "f6af4ea8afa2958d29ce9e7f02284322790a241d1e5c7c8cdbd2ff07a0f63f7e",
+    "protocol/crc32.cpp": "00589f12e508a856935d4e9ec56605fc2feb41f60bd968f1dcca8892a3423fc9",
+    "protocol/crc32.hpp": "40bf9f606057829fc7991be11021badda245a830eb725dc52d4bc29910bfa276",
+    "protocol/packet.hpp": "906096e815f7fb95886ad78565cd153967862d73d3ad4a763ee7fc414f8c2ddf",
+    "fault_injector/tcp_proxy.cpp": "a63cda3d6ecb64484b20686c70b4c8b0a7cf1ec47f38419944ace17e8e308365"
+  },
+  "harness_sha256": "bfe462f50467491157d663f4aefbaa01e15c94600e469cfe32aa063480dde2e1",
+  "baseline_tag": "v1.0.0",
+  "repetitions": 3,
+  "case": "case-01-late-ack",
+  "runs": [
+    {
+      "sender_exit": 1,
+      "timeout_count": 1,
+      "retry_count": 1,
+      "duplicate_count": 1,
+      "receiver_ack_count": 2,
+      "forwarded_ack_count": 2,
+      "heartbeat_acks": [],
+      "error": "Sender error: unexpected response type",
+      "receiver_error": "",
+      "receiver_survived": true,
+      "reconnected": false,
+      "events": [
+        {
+          "ms": 0.018,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.246,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.403,
+          "actor": "command",
+          "message": "tcp_proxy_1200 delay-ack"
+        },
+        {
+          "ms": 16.476,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault Injector listening on port 5000"
+        },
+        {
+          "ms": 16.489,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault mode: delay-ack"
+        },
+        {
+          "ms": 22.955,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 27.106,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 27.139,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 27.223,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 27.375,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 27.408,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 27.441,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 27.686,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=hello embedded"
+        },
+        {
+          "ms": 27.783,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 27.827,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[DELAY 1200ms] ACK seq=1"
+        },
+        {
+          "ms": 1028.332,
+          "actor": "tcp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1028.351,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=hello embedded"
+        },
+        {
+          "ms": 1228.04,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 1228.136,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 1228.205,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 1228.242,
+          "actor": "tcp_receiver.stdout",
+          "message": "Duplicate DATA seq=1 ignored"
+        },
+        {
+          "ms": 1228.37,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1228.416,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 3228.493,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 3228.606,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3228.693,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3228.798,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 3228.85,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: unexpected response type"
+        },
+        {
+          "ms": 3229.067,
+          "actor": "tcp_proxy_1200.stderr",
+          "message": "Proxy connection error: recv failed: Connection reset by peer"
+        },
+        {
+          "ms": 3229.188,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 3229.258,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 3229.286,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 3229.293,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_proxy_1200",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 1,
+      "variant": "main",
+      "matched_expected_behavior": true
+    },
+    {
+      "sender_exit": 1,
+      "timeout_count": 1,
+      "retry_count": 1,
+      "duplicate_count": 1,
+      "receiver_ack_count": 2,
+      "forwarded_ack_count": 2,
+      "heartbeat_acks": [],
+      "error": "Sender error: unexpected response type",
+      "receiver_error": "",
+      "receiver_survived": true,
+      "reconnected": false,
+      "events": [
+        {
+          "ms": 0.036,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 4.404,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.368,
+          "actor": "command",
+          "message": "tcp_proxy_1200 delay-ack"
+        },
+        {
+          "ms": 14.784,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault Injector listening on port 5000"
+        },
+        {
+          "ms": 14.795,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault mode: delay-ack"
+        },
+        {
+          "ms": 22.774,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 26.821,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 26.904,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 26.93,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 27.114,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 27.122,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 27.159,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 27.339,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=hello embedded"
+        },
+        {
+          "ms": 27.501,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 27.583,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[DELAY 1200ms] ACK seq=1"
+        },
+        {
+          "ms": 1028.149,
+          "actor": "tcp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1028.168,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=hello embedded"
+        },
+        {
+          "ms": 1227.8,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 1227.905,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 1227.943,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 1228.039,
+          "actor": "tcp_receiver.stdout",
+          "message": "Duplicate DATA seq=1 ignored"
+        },
+        {
+          "ms": 1228.049,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1228.1,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 3228.26,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3228.332,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 3228.433,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3228.486,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 3228.515,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: unexpected response type"
+        },
+        {
+          "ms": 3228.561,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 3228.604,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 3228.678,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 3228.827,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 3228.885,
+          "actor": "tcp_proxy_1200.stderr",
+          "message": "Proxy connection error: recv failed: Connection reset by peer"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_proxy_1200",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 2,
+      "variant": "main",
+      "matched_expected_behavior": true
+    },
+    {
+      "sender_exit": 1,
+      "timeout_count": 1,
+      "retry_count": 1,
+      "duplicate_count": 1,
+      "receiver_ack_count": 2,
+      "forwarded_ack_count": 2,
+      "heartbeat_acks": [],
+      "error": "Sender error: unexpected response type",
+      "receiver_error": "",
+      "receiver_survived": true,
+      "reconnected": false,
+      "events": [
+        {
+          "ms": 0.042,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.443,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.556,
+          "actor": "command",
+          "message": "tcp_proxy_1200 delay-ack"
+        },
+        {
+          "ms": 15.744,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault Injector listening on port 5000"
+        },
+        {
+          "ms": 15.765,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault mode: delay-ack"
+        },
+        {
+          "ms": 23.392,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 27.748,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 27.87,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 27.939,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=hello embedded"
+        },
+        {
+          "ms": 27.976,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 28.029,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 28.072,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 28.097,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 28.117,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[DELAY 1200ms] ACK seq=1"
+        },
+        {
+          "ms": 28.144,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 1028.886,
+          "actor": "tcp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1028.913,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=hello embedded"
+        },
+        {
+          "ms": 1228.191,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 1228.244,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 1228.318,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 1228.41,
+          "actor": "tcp_receiver.stdout",
+          "message": "Duplicate DATA seq=1 ignored"
+        },
+        {
+          "ms": 1228.448,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1228.49,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 3228.693,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 3228.765,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3228.81,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 3228.839,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: unexpected response type"
+        },
+        {
+          "ms": 3228.901,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3229.089,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 3229.192,
+          "actor": "tcp_proxy_1200.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 3229.248,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 3229.29,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 3229.317,
+          "actor": "tcp_proxy_1200.stderr",
+          "message": "Proxy connection error: recv failed: Connection reset by peer"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_proxy_1200",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 3,
+      "variant": "main",
+      "matched_expected_behavior": true
+    }
+  ],
+  "matched": 3,
+  "total": 3,
+  "verdict": "REPRODUCED"
+}

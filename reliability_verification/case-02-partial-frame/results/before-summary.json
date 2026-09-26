@@ -1,0 +1,870 @@
+{
+  "schema_version": 1,
+  "phase": "before",
+  "configured_timeout_ms": 1000,
+  "timing_tolerance_ms": [
+    900,
+    1250
+  ],
+  "source_sha256": {
+    "tcp/receiver.cpp": "6b0566bc9c3da4a80792aa5bbb6ba1f241f6651bc449816510849b73da4db27f",
+    "tcp/sender.cpp": "4dfcc6d2c8b9867893af75ee17e883bfebe39fdf398d64bad4daf21ffed9d208",
+    "udp/receiver.cpp": "975ace94f846fb8dfc6ff55096fc99c3f348ffd063167a31c4d073c0086c8e92",
+    "udp/sender.cpp": "61d63eb7ad3ed165a6736adc1a8fc571e2143f2368e49da933ca217011443783",
+    "protocol/codec.cpp": "e99a7bd688939ce757242e89db3bc533951a53b89fd18e62f0e99381f5c6dc5b",
+    "protocol/codec.hpp": "f6af4ea8afa2958d29ce9e7f02284322790a241d1e5c7c8cdbd2ff07a0f63f7e",
+    "protocol/crc32.cpp": "00589f12e508a856935d4e9ec56605fc2feb41f60bd968f1dcca8892a3423fc9",
+    "protocol/crc32.hpp": "40bf9f606057829fc7991be11021badda245a830eb725dc52d4bc29910bfa276",
+    "protocol/packet.hpp": "906096e815f7fb95886ad78565cd153967862d73d3ad4a763ee7fc414f8c2ddf",
+    "fault_injector/tcp_proxy.cpp": "a63cda3d6ecb64484b20686c70b4c8b0a7cf1ec47f38419944ace17e8e308365"
+  },
+  "harness_sha256": "bfe462f50467491157d663f4aefbaa01e15c94600e469cfe32aa063480dde2e1",
+  "baseline_tag": "v1.0.0",
+  "repetitions": 3,
+  "case": "case-02-partial-frame",
+  "runs": [
+    {
+      "boundary": "header-zero",
+      "bytes_sent": 0,
+      "receiver_survived": true,
+      "receiver_exit": null,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": true,
+      "followup_processed": true,
+      "followup_duplicate": false,
+      "followup_error": "",
+      "error": "",
+      "events": [
+        {
+          "ms": 0.051,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.502,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 13.041,
+          "actor": "client",
+          "message": "sent 0 bytes; shutdown write"
+        },
+        {
+          "ms": 13.143,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 13.194,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 13.384,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 13.775,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 13.784,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=followup"
+        },
+        {
+          "ms": 13.856,
+          "actor": "client",
+          "message": "follow-up same-sequence DATA -> valid ACK"
+        },
+        {
+          "ms": 13.883,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 13.961,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 13.973,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 1,
+      "variant": "header-zero",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "header-partial",
+      "bytes_sent": 8,
+      "receiver_survived": false,
+      "receiver_exit": 1,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": false,
+      "followup_processed": false,
+      "followup_duplicate": false,
+      "followup_error": "ConnectionRefusedError",
+      "error": "Receiver error: peer disconnected during packet receive",
+      "events": [
+        {
+          "ms": 0.029,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.501,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.488,
+          "actor": "client",
+          "message": "sent 8 bytes; shutdown write"
+        },
+        {
+          "ms": 11.551,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.636,
+          "actor": "tcp_receiver.stderr",
+          "message": "Receiver error: peer disconnected during packet receive"
+        },
+        {
+          "ms": 22.729,
+          "actor": "client",
+          "message": "ConnectionRefusedError"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 1,
+      "variant": "header-partial",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "payload-zero",
+      "bytes_sent": 16,
+      "receiver_survived": true,
+      "receiver_exit": null,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": true,
+      "followup_processed": true,
+      "followup_duplicate": false,
+      "followup_error": "",
+      "error": "",
+      "events": [
+        {
+          "ms": 0.034,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.299,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.501,
+          "actor": "client",
+          "message": "sent 16 bytes; shutdown write"
+        },
+        {
+          "ms": 11.582,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.593,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 11.794,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 22.376,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 22.391,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=followup"
+        },
+        {
+          "ms": 22.427,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 22.478,
+          "actor": "client",
+          "message": "follow-up same-sequence DATA -> valid ACK"
+        },
+        {
+          "ms": 22.565,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 22.604,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 1,
+      "variant": "payload-zero",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "payload-partial",
+      "bytes_sent": 19,
+      "receiver_survived": false,
+      "receiver_exit": 1,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": false,
+      "followup_processed": false,
+      "followup_duplicate": false,
+      "followup_error": "ConnectionRefusedError",
+      "error": "Receiver error: peer disconnected during packet receive",
+      "events": [
+        {
+          "ms": 0.033,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 4.113,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.92,
+          "actor": "client",
+          "message": "sent 19 bytes; shutdown write"
+        },
+        {
+          "ms": 11.979,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 12.062,
+          "actor": "tcp_receiver.stderr",
+          "message": "Receiver error: peer disconnected during packet receive"
+        },
+        {
+          "ms": 22.835,
+          "actor": "client",
+          "message": "ConnectionRefusedError"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 1,
+      "variant": "payload-partial",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "header-zero",
+      "bytes_sent": 0,
+      "receiver_survived": true,
+      "receiver_exit": null,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": true,
+      "followup_processed": true,
+      "followup_duplicate": false,
+      "followup_error": "",
+      "error": "",
+      "events": [
+        {
+          "ms": 0.032,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.394,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.6,
+          "actor": "client",
+          "message": "sent 0 bytes; shutdown write"
+        },
+        {
+          "ms": 11.68,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.732,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 11.871,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 12.162,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 12.17,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=followup"
+        },
+        {
+          "ms": 12.214,
+          "actor": "client",
+          "message": "follow-up same-sequence DATA -> valid ACK"
+        },
+        {
+          "ms": 12.233,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 12.283,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 12.318,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 2,
+      "variant": "header-zero",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "header-partial",
+      "bytes_sent": 8,
+      "receiver_survived": false,
+      "receiver_exit": 1,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": false,
+      "followup_processed": false,
+      "followup_duplicate": false,
+      "followup_error": "ConnectionRefusedError",
+      "error": "Receiver error: peer disconnected during packet receive",
+      "events": [
+        {
+          "ms": 0.028,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.685,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.464,
+          "actor": "client",
+          "message": "sent 8 bytes; shutdown write"
+        },
+        {
+          "ms": 11.553,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.636,
+          "actor": "tcp_receiver.stderr",
+          "message": "Receiver error: peer disconnected during packet receive"
+        },
+        {
+          "ms": 22.5,
+          "actor": "client",
+          "message": "ConnectionRefusedError"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 2,
+      "variant": "header-partial",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "payload-zero",
+      "bytes_sent": 16,
+      "receiver_survived": true,
+      "receiver_exit": null,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": true,
+      "followup_processed": true,
+      "followup_duplicate": false,
+      "followup_error": "",
+      "error": "",
+      "events": [
+        {
+          "ms": 0.053,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.611,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.659,
+          "actor": "client",
+          "message": "sent 16 bytes; shutdown write"
+        },
+        {
+          "ms": 11.713,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.783,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 11.924,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 12.196,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 12.209,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=followup"
+        },
+        {
+          "ms": 12.249,
+          "actor": "client",
+          "message": "follow-up same-sequence DATA -> valid ACK"
+        },
+        {
+          "ms": 12.288,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 12.36,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 12.37,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 2,
+      "variant": "payload-zero",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "payload-partial",
+      "bytes_sent": 19,
+      "receiver_survived": false,
+      "receiver_exit": 1,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": false,
+      "followup_processed": false,
+      "followup_duplicate": false,
+      "followup_error": "ConnectionRefusedError",
+      "error": "Receiver error: peer disconnected during packet receive",
+      "events": [
+        {
+          "ms": 0.034,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.871,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.685,
+          "actor": "client",
+          "message": "sent 19 bytes; shutdown write"
+        },
+        {
+          "ms": 11.783,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.898,
+          "actor": "tcp_receiver.stderr",
+          "message": "Receiver error: peer disconnected during packet receive"
+        },
+        {
+          "ms": 22.929,
+          "actor": "client",
+          "message": "ConnectionRefusedError"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 2,
+      "variant": "payload-partial",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "header-zero",
+      "bytes_sent": 0,
+      "receiver_survived": true,
+      "receiver_exit": null,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": true,
+      "followup_processed": true,
+      "followup_duplicate": false,
+      "followup_error": "",
+      "error": "",
+      "events": [
+        {
+          "ms": 0.044,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.707,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.781,
+          "actor": "client",
+          "message": "sent 0 bytes; shutdown write"
+        },
+        {
+          "ms": 11.88,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.948,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 12.215,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 12.441,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 12.449,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=followup"
+        },
+        {
+          "ms": 12.498,
+          "actor": "client",
+          "message": "follow-up same-sequence DATA -> valid ACK"
+        },
+        {
+          "ms": 12.515,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 12.578,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 12.616,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 3,
+      "variant": "header-zero",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "header-partial",
+      "bytes_sent": 8,
+      "receiver_survived": false,
+      "receiver_exit": 1,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": false,
+      "followup_processed": false,
+      "followup_duplicate": false,
+      "followup_error": "ConnectionRefusedError",
+      "error": "Receiver error: peer disconnected during packet receive",
+      "events": [
+        {
+          "ms": 0.027,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 4.219,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.82,
+          "actor": "client",
+          "message": "sent 8 bytes; shutdown write"
+        },
+        {
+          "ms": 11.95,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.991,
+          "actor": "tcp_receiver.stderr",
+          "message": "Receiver error: peer disconnected during packet receive"
+        },
+        {
+          "ms": 23.039,
+          "actor": "client",
+          "message": "ConnectionRefusedError"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 3,
+      "variant": "header-partial",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "payload-zero",
+      "bytes_sent": 16,
+      "receiver_survived": true,
+      "receiver_exit": null,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": true,
+      "followup_processed": true,
+      "followup_duplicate": false,
+      "followup_error": "",
+      "error": "",
+      "events": [
+        {
+          "ms": 0.047,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 4.683,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 12.459,
+          "actor": "client",
+          "message": "sent 16 bytes; shutdown write"
+        },
+        {
+          "ms": 12.511,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 12.602,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 12.843,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 23.385,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 23.416,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=followup"
+        },
+        {
+          "ms": 23.444,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 23.476,
+          "actor": "client",
+          "message": "follow-up same-sequence DATA -> valid ACK"
+        },
+        {
+          "ms": 23.568,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 23.577,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        }
+      ],
+      "run": 3,
+      "variant": "payload-zero",
+      "matched_expected_behavior": true
+    },
+    {
+      "boundary": "payload-partial",
+      "bytes_sent": 19,
+      "receiver_survived": false,
+      "receiver_exit": 1,
+      "incomplete_ack_bytes": 0,
+      "incomplete_processed": false,
+      "followup_ack": false,
+      "followup_processed": false,
+      "followup_duplicate": false,
+      "followup_error": "ConnectionRefusedError",
+      "error": "Receiver error: peer disconnected during packet receive",
+      "events": [
+        {
+          "ms": 0.029,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 4.843,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.768,
+          "actor": "client",
+          "message": "sent 19 bytes; shutdown write"
+        },
+        {
+          "ms": 11.816,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 11.901,
+          "actor": "tcp_receiver.stderr",
+          "message": "Receiver error: peer disconnected during packet receive"
+        },
+        {
+          "ms": 12.441,
+          "actor": "client",
+          "message": "ConnectionRefusedError"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 3,
+      "variant": "payload-partial",
+      "matched_expected_behavior": true
+    }
+  ],
+  "matched": 12,
+  "total": 12,
+  "verdict": "REPRODUCED"
+}
