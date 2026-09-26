@@ -1,0 +1,846 @@
+{
+  "configured_timeout_ms": 1000,
+  "tolerance_ms": [
+    900,
+    1250
+  ],
+  "total": 11,
+  "passed": 11,
+  "runs": [
+    {
+      "scenario": "tcp-wrong-type",
+      "passed": true,
+      "outcome_ms": null,
+      "error": "Sender error: invalid response packet",
+      "events": [
+        {
+          "ms": 0.077,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 18.995,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 19.147,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 19.185,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: invalid response packet"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "tcp-unknown-sequence",
+      "passed": true,
+      "outcome_ms": null,
+      "error": "Sender error: unexpected response type or sequence",
+      "events": [
+        {
+          "ms": 0.1,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 18.581,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 18.605,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 18.651,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: unexpected response type or sequence"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "tcp-payload",
+      "passed": true,
+      "outcome_ms": null,
+      "error": "Sender error: invalid response packet",
+      "events": [
+        {
+          "ms": 0.037,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 3.583,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 3.626,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 3.9,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: invalid response packet"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "tcp-wrong-crc",
+      "passed": true,
+      "outcome_ms": null,
+      "error": "Sender error: CRC mismatch",
+      "events": [
+        {
+          "ms": 0.046,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 4.301,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 4.386,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 4.528,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: CRC mismatch"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "tcp-stale-deadline",
+      "passed": true,
+      "outcome_ms": 1024.528,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.047,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 3.518,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 3.607,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 3.667,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 2004.014,
+          "actor": "peer",
+          "message": "HEARTBEAT seq=2 received"
+        },
+        {
+          "ms": 2004.136,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2004.206,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 2004.227,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2064.375,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2064.469,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2124.677,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2124.78,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2184.907,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2185.031,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2245.138,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2245.235,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2305.495,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2305.63,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2365.779,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2365.908,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2426.002,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2426.129,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2486.237,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2486.341,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2546.492,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2546.617,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2606.709,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2606.805,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2667.06,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2667.192,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2727.339,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2727.523,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2787.588,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2787.693,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2847.842,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2847.967,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2908.047,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2908.139,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 2968.26,
+          "actor": "peer",
+          "message": "stale ACK seq=1 sent"
+        },
+        {
+          "ms": 2968.382,
+          "actor": "tcp_sender.stdout",
+          "message": "Ignored stale response seq=1"
+        },
+        {
+          "ms": 3004.71,
+          "actor": "tcp_sender.stdout",
+          "message": "HEARTBEAT timeout seq=2"
+        },
+        {
+          "ms": 3004.734,
+          "actor": "tcp_sender.stdout",
+          "message": "Reconnecting..."
+        },
+        {
+          "ms": 3004.882,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 3004.889,
+          "actor": "tcp_sender.stdout",
+          "message": "Resent HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3028.762,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 5029.011,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=3 count=2"
+        },
+        {
+          "ms": 5029.054,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 7029.321,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=4 count=3"
+        },
+        {
+          "ms": 7029.363,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=4"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "tcp-heartbeat-partial",
+      "passed": true,
+      "outcome_ms": 1017.016,
+      "error": "Sender error: partial response deadline exceeded; connection discarded",
+      "events": [
+        {
+          "ms": 0.039,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 4.296,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 4.319,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 4.322,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 2004.551,
+          "actor": "peer",
+          "message": "HEARTBEAT seq=2 received"
+        },
+        {
+          "ms": 2004.669,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 3005.937,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: partial response deadline exceeded; connection discarded"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "udp-wrong-type",
+      "passed": true,
+      "outcome_ms": null,
+      "error": "UDP Sender error: expected empty ACK packet",
+      "events": [
+        {
+          "ms": 0.038,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 4.109,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 4.176,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 4.426,
+          "actor": "udp_sender.stderr",
+          "message": "UDP Sender error: expected empty ACK packet"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "udp-unknown-sequence",
+      "passed": true,
+      "outcome_ms": null,
+      "error": "UDP Sender error: ACK sequence mismatch",
+      "events": [
+        {
+          "ms": 8.524,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 12.65,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 12.694,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 12.975,
+          "actor": "udp_sender.stderr",
+          "message": "UDP Sender error: ACK sequence mismatch"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "udp-payload",
+      "passed": true,
+      "outcome_ms": null,
+      "error": "UDP Sender error: expected empty ACK packet",
+      "events": [
+        {
+          "ms": 0.034,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 3.479,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 3.6,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 3.754,
+          "actor": "udp_sender.stderr",
+          "message": "UDP Sender error: expected empty ACK packet"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "udp-wrong-crc",
+      "passed": true,
+      "outcome_ms": null,
+      "error": "UDP Sender error: CRC mismatch",
+      "events": [
+        {
+          "ms": 0.041,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 3.065,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 3.243,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 3.363,
+          "actor": "udp_sender.stderr",
+          "message": "UDP Sender error: CRC mismatch"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ]
+    },
+    {
+      "scenario": "udp-stale-deadline",
+      "passed": true,
+      "outcome_ms": 1000.813,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.148,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 4.425,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 4.443,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 4.627,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 4.667,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=3 attempt=1 payload=message-3"
+        },
+        {
+          "ms": 4.779,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=3"
+        },
+        {
+          "ms": 4.808,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=2 attempt=1 payload=message-2"
+        },
+        {
+          "ms": 4.841,
+          "actor": "peer",
+          "message": "DATA seq=2 received"
+        },
+        {
+          "ms": 4.872,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 4.91,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 65.163,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 65.271,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 125.54,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 125.692,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 185.787,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 185.892,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 246.011,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 246.124,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 306.296,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 306.444,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 366.587,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 366.721,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 426.9,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 427.07,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 487.157,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 487.29,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 547.384,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 547.487,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 607.611,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 607.742,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 667.857,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 667.973,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 728.086,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 728.191,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 788.392,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 788.632,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 848.648,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 848.781,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 908.899,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 909.028,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 969.149,
+          "actor": "peer",
+          "message": "stale ACK seq=3 sent while expecting seq=2"
+        },
+        {
+          "ms": 969.258,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=3"
+        },
+        {
+          "ms": 1005.542,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=2"
+        },
+        {
+          "ms": 1005.587,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=2 attempt=2 payload=message-2"
+        },
+        {
+          "ms": 1005.656,
+          "actor": "peer",
+          "message": "retry DATA seq=2 received"
+        },
+        {
+          "ms": 1005.761,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=2"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ]
+    }
+  ]
+}

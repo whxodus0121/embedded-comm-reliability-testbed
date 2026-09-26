@@ -7,6 +7,8 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <chrono>
+#include <unordered_set>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -72,48 +74,60 @@ protocol::Packet receive_packet(int fd)
     return protocol::decode_packet(buffer.data(), protocol::kHeaderSize, buffer.data() + protocol::kHeaderSize, payload_length);
 }
 
-bool wait_for_ack(int fd, uint32_t expected_sequence)
+bool wait_for_ack(
+    int fd, uint32_t expected_sequence,
+    std::unordered_set<uint32_t>& completed_sequences)
 {
-    pollfd pfd{};
-    pfd.fd = fd;
-    pfd.events = POLLIN;
-
-    int result;
-
-    do {
-        result = poll(&pfd, 1, kAckTimeoutMs);
-    } while (result < 0 && errno == EINTR);
-
-    if (result < 0) {
-        throw std::runtime_error(std::string("poll failed: ") + std::strerror(errno));
-    }
-
-    if (result == 0) {
-        return false;
-    }
-
-    if (pfd.revents & (POLLERR | POLLNVAL)) {
-        throw std::runtime_error("UDP socket error while waiting for ACK");
-    }
-
-    if (!(pfd.revents & POLLIN)) {
-        return false;
-    }
-
-    protocol::Packet ack = receive_packet(fd);
-
-    if (ack.type != protocol::MessageType::Ack) {
-        throw std::runtime_error("expected ACK packet");
-    }
-
-    if (ack.sequence != expected_sequence) {
+    const auto deadline = std::chrono::steady_clock::now()
+        + std::chrono::milliseconds(kAckTimeoutMs);
+    while (true) {
+        const auto remaining = deadline - std::chrono::steady_clock::now();
+        if (remaining <= decltype(remaining)::zero()) {
+            return false;
+        }
+        pollfd pfd{};
+        pfd.fd = fd;
+        pfd.events = POLLIN;
+        const int timeout_ms = static_cast<int>(
+            std::chrono::ceil<std::chrono::milliseconds>(remaining).count());
+        const int result = poll(&pfd, 1, timeout_ms);
+        if (result < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            throw std::runtime_error(
+                std::string("poll failed: ") + std::strerror(errno));
+        }
+        if (result == 0) {
+            return false;
+        }
+        if (pfd.revents & (POLLERR | POLLNVAL)) {
+            throw std::runtime_error("UDP socket error while waiting for ACK");
+        }
+        if (!(pfd.revents & POLLIN)) {
+            continue;
+        }
+        protocol::Packet ack = receive_packet(fd);
+        if (std::chrono::steady_clock::now() >= deadline) {
+            return false;
+        }
+        if (ack.type != protocol::MessageType::Ack || !ack.payload.empty()) {
+            throw std::runtime_error("expected empty ACK packet");
+        }
+        if (ack.sequence == expected_sequence) {
+            completed_sequences.insert(ack.sequence);
+            return true;
+        }
+        // Completion history, not numeric ordering: DATA order can be 1,3,2.
+        if (completed_sequences.count(ack.sequence) != 0) {
+            std::cout << "Ignored stale ACK seq=" << ack.sequence << '\n';
+            continue;
+        }
         throw std::runtime_error("ACK sequence mismatch");
     }
-
-    return true;
 }
 
-void send_data_with_retry(int fd, const sockaddr_in& receiver_address, uint32_t sequence, const std::string& message)
+void send_data_with_retry(int fd, const sockaddr_in& receiver_address, uint32_t sequence, const std::string& message, std::unordered_set<uint32_t>& completed_sequences)
 {
     protocol::Packet data_packet{protocol::MessageType::Data, sequence, std::vector<uint8_t>(message.begin(), message.end())};
 
@@ -121,7 +135,7 @@ void send_data_with_retry(int fd, const sockaddr_in& receiver_address, uint32_t 
         send_packet(fd, data_packet, receiver_address);
         std::cout << "Sent DATA seq=" << sequence << " attempt=" << attempt << " payload=" << message << '\n';
 
-        if (wait_for_ack(fd, sequence)) {
+        if (wait_for_ack(fd, sequence, completed_sequences)) {
             std::cout << "Received ACK seq=" << sequence << '\n';
             return;
         }
@@ -154,15 +168,16 @@ int main(int argc, char* argv[])
         }
 
         sockaddr_in receiver_address = create_receiver_address();
+        std::unordered_set<uint32_t> completed_sequences;
 
         if (out_of_order) {
             std::cout << "Test mode: out-of-order\n";
-            send_data_with_retry(fd, receiver_address, 1, "message-1");
-            send_data_with_retry(fd, receiver_address, 3, "message-3");
-            send_data_with_retry(fd, receiver_address, 2, "message-2");
+            send_data_with_retry(fd, receiver_address, 1, "message-1", completed_sequences);
+            send_data_with_retry(fd, receiver_address, 3, "message-3", completed_sequences);
+            send_data_with_retry(fd, receiver_address, 2, "message-2", completed_sequences);
         }
         else {
-            send_data_with_retry(fd, receiver_address, 1, "hello udp");
+            send_data_with_retry(fd, receiver_address, 1, "hello udp", completed_sequences);
         }
 
         close(fd);

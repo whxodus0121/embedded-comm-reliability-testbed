@@ -1,0 +1,681 @@
+{
+  "schema_version": 1,
+  "phase": "after",
+  "configured_timeout_ms": 1000,
+  "timing_tolerance_ms": [
+    900,
+    1250
+  ],
+  "source_sha256": {
+    "tcp/receiver.cpp": "4b9dafc23361c2bc4451b8e9aea50e3980e199a73fb4fac183f938b5ab0bc5e2",
+    "tcp/sender.cpp": "2cea78217de0eb9402dc37cc640f855f7aac43bc2ae6bd3085e21bae44be3b2f",
+    "udp/receiver.cpp": "975ace94f846fb8dfc6ff55096fc99c3f348ffd063167a31c4d073c0086c8e92",
+    "udp/sender.cpp": "d1d1c440a01846a7ad1972621b13a2b1dc53060c42fe2af61d9040a7197e062c",
+    "protocol/codec.cpp": "e99a7bd688939ce757242e89db3bc533951a53b89fd18e62f0e99381f5c6dc5b",
+    "protocol/codec.hpp": "f6af4ea8afa2958d29ce9e7f02284322790a241d1e5c7c8cdbd2ff07a0f63f7e",
+    "protocol/crc32.cpp": "00589f12e508a856935d4e9ec56605fc2feb41f60bd968f1dcca8892a3423fc9",
+    "protocol/crc32.hpp": "40bf9f606057829fc7991be11021badda245a830eb725dc52d4bc29910bfa276",
+    "protocol/packet.hpp": "906096e815f7fb95886ad78565cd153967862d73d3ad4a763ee7fc414f8c2ddf",
+    "fault_injector/tcp_proxy.cpp": "a63cda3d6ecb64484b20686c70b4c8b0a7cf1ec47f38419944ace17e8e308365"
+  },
+  "harness_sha256": "bfe462f50467491157d663f4aefbaa01e15c94600e469cfe32aa063480dde2e1",
+  "baseline_tag": "v1.0.0",
+  "repetitions": 3,
+  "case": "case-04-udp-stale-ack",
+  "runs": [
+    {
+      "sender_exit": 0,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1,
+        1,
+        3,
+        2
+      ],
+      "ack_sequences": [
+        1,
+        3,
+        2
+      ],
+      "timeout_count": 1,
+      "retry_count": 1,
+      "duplicate_count": 1,
+      "ack3_generated": true,
+      "error": "",
+      "events": [
+        {
+          "ms": 10.025,
+          "actor": "command",
+          "message": "udp_receiver_port6001 out-of-order"
+        },
+        {
+          "ms": 13.266,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 13.275,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 21.32,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 25.97,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 26.093,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 26.122,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 26.313,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 26.318,
+          "actor": "relay",
+          "message": "first ACK seq=1 held"
+        },
+        {
+          "ms": 26.399,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=message-1"
+        },
+        {
+          "ms": 26.404,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1027.211,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1027.318,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 1027.357,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=message-1"
+        },
+        {
+          "ms": 1027.463,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Duplicate DATA seq=1 ignored"
+        },
+        {
+          "ms": 1027.512,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 1027.553,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1027.567,
+          "actor": "relay",
+          "message": "ACK seq=1 forwarded unchanged"
+        },
+        {
+          "ms": 1027.628,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 1027.69,
+          "actor": "relay",
+          "message": "DATA seq=3; receiver_exit=None"
+        },
+        {
+          "ms": 1027.723,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=3 attempt=1 payload=message-3"
+        },
+        {
+          "ms": 1027.761,
+          "actor": "relay",
+          "message": "held ACK seq=1 released unchanged"
+        },
+        {
+          "ms": 1027.795,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Out-of-order DATA seq=3 expected=2"
+        },
+        {
+          "ms": 1027.802,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=3 payload=message-3"
+        },
+        {
+          "ms": 1027.852,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=1"
+        },
+        {
+          "ms": 1027.903,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=3"
+        },
+        {
+          "ms": 1027.943,
+          "actor": "relay",
+          "message": "valid ACK seq=3 received hex=aa55010200000003000000006669d218"
+        },
+        {
+          "ms": 1180.813,
+          "actor": "relay",
+          "message": "actual ACK seq=3 forwarded unchanged"
+        },
+        {
+          "ms": 1180.94,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=3"
+        },
+        {
+          "ms": 1180.997,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=2 attempt=1 payload=message-2"
+        },
+        {
+          "ms": 1181.069,
+          "actor": "relay",
+          "message": "DATA seq=2; receiver_exit=None"
+        },
+        {
+          "ms": 1181.207,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=2 payload=message-2"
+        },
+        {
+          "ms": 1181.232,
+          "actor": "relay",
+          "message": "valid ACK seq=2 received hex=aa55010200000002000000005b09fba8"
+        },
+        {
+          "ms": 1181.279,
+          "actor": "relay",
+          "message": "ACK seq=2 forwarded unchanged"
+        },
+        {
+          "ms": 1181.308,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=2"
+        },
+        {
+          "ms": 1181.347,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=2"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "run": 1,
+      "variant": "main",
+      "matched_expected_behavior": true
+    },
+    {
+      "sender_exit": 0,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1,
+        1,
+        3,
+        2
+      ],
+      "ack_sequences": [
+        1,
+        3,
+        2
+      ],
+      "timeout_count": 1,
+      "retry_count": 1,
+      "duplicate_count": 1,
+      "ack3_generated": true,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.275,
+          "actor": "command",
+          "message": "udp_receiver_port6001 out-of-order"
+        },
+        {
+          "ms": 4.071,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 4.082,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 12.119,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 16.08,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 16.178,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 16.215,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 16.35,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=message-1"
+        },
+        {
+          "ms": 16.359,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 16.41,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 16.415,
+          "actor": "relay",
+          "message": "first ACK seq=1 held"
+        },
+        {
+          "ms": 1017.385,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1017.446,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=message-1"
+        },
+        {
+          "ms": 1017.504,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 1017.682,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Duplicate DATA seq=1 ignored"
+        },
+        {
+          "ms": 1017.696,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1017.745,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 1017.815,
+          "actor": "relay",
+          "message": "ACK seq=1 forwarded unchanged"
+        },
+        {
+          "ms": 1017.941,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 1017.947,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=3 attempt=1 payload=message-3"
+        },
+        {
+          "ms": 1017.994,
+          "actor": "relay",
+          "message": "DATA seq=3; receiver_exit=None"
+        },
+        {
+          "ms": 1018.049,
+          "actor": "relay",
+          "message": "held ACK seq=1 released unchanged"
+        },
+        {
+          "ms": 1018.122,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Out-of-order DATA seq=3 expected=2"
+        },
+        {
+          "ms": 1018.129,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=3 payload=message-3"
+        },
+        {
+          "ms": 1018.18,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=3"
+        },
+        {
+          "ms": 1018.205,
+          "actor": "relay",
+          "message": "valid ACK seq=3 received hex=aa55010200000003000000006669d218"
+        },
+        {
+          "ms": 1018.287,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=1"
+        },
+        {
+          "ms": 1178.282,
+          "actor": "relay",
+          "message": "actual ACK seq=3 forwarded unchanged"
+        },
+        {
+          "ms": 1178.48,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=3"
+        },
+        {
+          "ms": 1178.495,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=2 attempt=1 payload=message-2"
+        },
+        {
+          "ms": 1178.553,
+          "actor": "relay",
+          "message": "DATA seq=2; receiver_exit=None"
+        },
+        {
+          "ms": 1178.698,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=2 payload=message-2"
+        },
+        {
+          "ms": 1178.759,
+          "actor": "relay",
+          "message": "valid ACK seq=2 received hex=aa55010200000002000000005b09fba8"
+        },
+        {
+          "ms": 1178.799,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=2"
+        },
+        {
+          "ms": 1178.838,
+          "actor": "relay",
+          "message": "ACK seq=2 forwarded unchanged"
+        },
+        {
+          "ms": 1178.985,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=2"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "run": 2,
+      "variant": "main",
+      "matched_expected_behavior": true
+    },
+    {
+      "sender_exit": 0,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1,
+        1,
+        3,
+        2
+      ],
+      "ack_sequences": [
+        1,
+        3,
+        2
+      ],
+      "timeout_count": 1,
+      "retry_count": 1,
+      "duplicate_count": 1,
+      "ack3_generated": true,
+      "error": "",
+      "events": [
+        {
+          "ms": 8.393,
+          "actor": "command",
+          "message": "udp_receiver_port6001 out-of-order"
+        },
+        {
+          "ms": 11.93,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 11.941,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 20.03,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 25.534,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 25.683,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 25.726,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 25.854,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=message-1"
+        },
+        {
+          "ms": 25.897,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 25.903,
+          "actor": "relay",
+          "message": "first ACK seq=1 held"
+        },
+        {
+          "ms": 25.95,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1026.698,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1026.742,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=message-1"
+        },
+        {
+          "ms": 1026.824,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 1026.942,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Duplicate DATA seq=1 ignored"
+        },
+        {
+          "ms": 1026.952,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1027.0,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 1027.035,
+          "actor": "relay",
+          "message": "ACK seq=1 forwarded unchanged"
+        },
+        {
+          "ms": 1027.09,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 1027.152,
+          "actor": "relay",
+          "message": "DATA seq=3; receiver_exit=None"
+        },
+        {
+          "ms": 1027.196,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=3 attempt=1 payload=message-3"
+        },
+        {
+          "ms": 1027.212,
+          "actor": "relay",
+          "message": "held ACK seq=1 released unchanged"
+        },
+        {
+          "ms": 1027.32,
+          "actor": "relay",
+          "message": "valid ACK seq=3 received hex=aa55010200000003000000006669d218"
+        },
+        {
+          "ms": 1027.391,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Out-of-order DATA seq=3 expected=2"
+        },
+        {
+          "ms": 1027.424,
+          "actor": "udp_sender.stdout",
+          "message": "Ignored stale ACK seq=1"
+        },
+        {
+          "ms": 1027.455,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=3 payload=message-3"
+        },
+        {
+          "ms": 1027.462,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=3"
+        },
+        {
+          "ms": 1180.158,
+          "actor": "relay",
+          "message": "actual ACK seq=3 forwarded unchanged"
+        },
+        {
+          "ms": 1180.436,
+          "actor": "relay",
+          "message": "DATA seq=2; receiver_exit=None"
+        },
+        {
+          "ms": 1180.483,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=3"
+        },
+        {
+          "ms": 1180.554,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=2 attempt=1 payload=message-2"
+        },
+        {
+          "ms": 1180.653,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=2 payload=message-2"
+        },
+        {
+          "ms": 1180.681,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=2"
+        },
+        {
+          "ms": 1180.707,
+          "actor": "relay",
+          "message": "valid ACK seq=2 received hex=aa55010200000002000000005b09fba8"
+        },
+        {
+          "ms": 1180.744,
+          "actor": "relay",
+          "message": "ACK seq=2 forwarded unchanged"
+        },
+        {
+          "ms": 1180.847,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=2"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "run": 3,
+      "variant": "main",
+      "matched_expected_behavior": true
+    }
+  ],
+  "matched": 3,
+  "total": 3,
+  "verdict": "PASS"
+}

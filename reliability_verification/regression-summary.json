@@ -1,0 +1,1512 @@
+{
+  "schema_version": 1,
+  "phase": "after",
+  "configured_timeout_ms": 1000,
+  "timing_tolerance_ms": [
+    900,
+    1250
+  ],
+  "source_sha256": {
+    "tcp/receiver.cpp": "4b9dafc23361c2bc4451b8e9aea50e3980e199a73fb4fac183f938b5ab0bc5e2",
+    "tcp/sender.cpp": "2cea78217de0eb9402dc37cc640f855f7aac43bc2ae6bd3085e21bae44be3b2f",
+    "udp/receiver.cpp": "975ace94f846fb8dfc6ff55096fc99c3f348ffd063167a31c4d073c0086c8e92",
+    "udp/sender.cpp": "d1d1c440a01846a7ad1972621b13a2b1dc53060c42fe2af61d9040a7197e062c",
+    "protocol/codec.cpp": "e99a7bd688939ce757242e89db3bc533951a53b89fd18e62f0e99381f5c6dc5b",
+    "protocol/codec.hpp": "f6af4ea8afa2958d29ce9e7f02284322790a241d1e5c7c8cdbd2ff07a0f63f7e",
+    "protocol/crc32.cpp": "00589f12e508a856935d4e9ec56605fc2feb41f60bd968f1dcca8892a3423fc9",
+    "protocol/crc32.hpp": "40bf9f606057829fc7991be11021badda245a830eb725dc52d4bc29910bfa276",
+    "protocol/packet.hpp": "906096e815f7fb95886ad78565cd153967862d73d3ad4a763ee7fc414f8c2ddf",
+    "fault_injector/tcp_proxy.cpp": "a63cda3d6ecb64484b20686c70b4c8b0a7cf1ec47f38419944ace17e8e308365"
+  },
+  "harness_sha256": "bfe462f50467491157d663f4aefbaa01e15c94600e469cfe32aa063480dde2e1",
+  "baseline_tag": "v1.0.0",
+  "repetitions": 3,
+  "runs": [
+    {
+      "sender_exit": 0,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "duplicate_count": 0,
+      "receiver_ack_count": 1,
+      "forwarded_ack_count": 1,
+      "heartbeat_acks": [
+        2,
+        3,
+        4
+      ],
+      "error": "",
+      "receiver_error": "",
+      "receiver_survived": true,
+      "reconnected": false,
+      "events": [
+        {
+          "ms": 0.017,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.548,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.826,
+          "actor": "command",
+          "message": "tcp_fault_injector none"
+        },
+        {
+          "ms": 16.355,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector listening on port 5000"
+        },
+        {
+          "ms": 16.369,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault mode: none"
+        },
+        {
+          "ms": 23.469,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 36.836,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 37.002,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 37.227,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 41.921,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 41.961,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 42.01,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 42.035,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=hello embedded"
+        },
+        {
+          "ms": 42.108,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 42.146,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 42.193,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 2042.466,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=2"
+        },
+        {
+          "ms": 2042.504,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 2042.544,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=2"
+        },
+        {
+          "ms": 2042.549,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 2042.562,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 2042.621,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 4042.965,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=3"
+        },
+        {
+          "ms": 4042.999,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=3 count=2"
+        },
+        {
+          "ms": 4043.104,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 4043.133,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=3"
+        },
+        {
+          "ms": 4043.147,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 4043.194,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 6043.57,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=4"
+        },
+        {
+          "ms": 6043.657,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=4 count=3"
+        },
+        {
+          "ms": 6043.715,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=4"
+        },
+        {
+          "ms": 6043.797,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6043.84,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6043.891,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6043.93,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Proxy connection closed: peer disconnected"
+        },
+        {
+          "ms": 6044.038,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 6044.098,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 6044.108,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_fault_injector",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "scenario": "tcp-none",
+      "passed": true
+    },
+    {
+      "sender_exit": 0,
+      "timeout_count": 1,
+      "retry_count": 1,
+      "duplicate_count": 1,
+      "receiver_ack_count": 2,
+      "forwarded_ack_count": 1,
+      "heartbeat_acks": [
+        2,
+        3,
+        4
+      ],
+      "error": "",
+      "receiver_error": "",
+      "receiver_survived": true,
+      "reconnected": false,
+      "events": [
+        {
+          "ms": 0.013,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.499,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.597,
+          "actor": "command",
+          "message": "tcp_fault_injector drop-ack"
+        },
+        {
+          "ms": 16.194,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector listening on port 5000"
+        },
+        {
+          "ms": 16.207,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault mode: drop-ack"
+        },
+        {
+          "ms": 23.544,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 28.052,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 28.1,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 28.124,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 28.176,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 28.188,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 28.23,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 28.25,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=hello embedded"
+        },
+        {
+          "ms": 28.445,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[DROP] ACK seq=1"
+        },
+        {
+          "ms": 28.474,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1029.324,
+          "actor": "tcp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1029.344,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=hello embedded"
+        },
+        {
+          "ms": 1029.479,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 1029.54,
+          "actor": "tcp_receiver.stdout",
+          "message": "Duplicate DATA seq=1 ignored"
+        },
+        {
+          "ms": 1029.629,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1029.689,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 1029.712,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 3029.958,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3029.996,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 3030.045,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=2"
+        },
+        {
+          "ms": 3030.081,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 3030.135,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 3030.173,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 5030.455,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=3"
+        },
+        {
+          "ms": 5030.491,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=3 count=2"
+        },
+        {
+          "ms": 5030.537,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=3"
+        },
+        {
+          "ms": 5030.546,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 5030.568,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 5030.616,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 7030.893,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=4"
+        },
+        {
+          "ms": 7030.931,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=4 count=3"
+        },
+        {
+          "ms": 7030.977,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=4"
+        },
+        {
+          "ms": 7030.988,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 7031.005,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 7031.075,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 7031.24,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Proxy connection closed: peer disconnected"
+        },
+        {
+          "ms": 7031.314,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 7031.387,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 7031.431,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_fault_injector",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "scenario": "tcp-drop-ack",
+      "passed": true
+    },
+    {
+      "sender_exit": 0,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "duplicate_count": 0,
+      "receiver_ack_count": 1,
+      "forwarded_ack_count": 1,
+      "heartbeat_acks": [
+        2,
+        3,
+        4
+      ],
+      "error": "",
+      "receiver_error": "",
+      "receiver_survived": true,
+      "reconnected": false,
+      "events": [
+        {
+          "ms": 0.015,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.554,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.522,
+          "actor": "command",
+          "message": "tcp_fault_injector delay-ack"
+        },
+        {
+          "ms": 15.894,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector listening on port 5000"
+        },
+        {
+          "ms": 15.907,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault mode: delay-ack"
+        },
+        {
+          "ms": 22.793,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 26.233,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 26.272,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 26.298,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 26.482,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 26.521,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 26.637,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 26.718,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=hello embedded"
+        },
+        {
+          "ms": 26.781,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 26.828,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[DELAY 700ms] ACK seq=1"
+        },
+        {
+          "ms": 726.968,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 727.053,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 2727.352,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 2727.431,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=2"
+        },
+        {
+          "ms": 2727.467,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 2727.497,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=2"
+        },
+        {
+          "ms": 2727.506,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 2727.547,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 4727.837,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=3 count=2"
+        },
+        {
+          "ms": 4727.891,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=3"
+        },
+        {
+          "ms": 4727.973,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=3"
+        },
+        {
+          "ms": 4727.988,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 4728.039,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 4728.134,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 6728.544,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=4 count=3"
+        },
+        {
+          "ms": 6728.627,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=4"
+        },
+        {
+          "ms": 6728.688,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6728.739,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6728.782,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=4"
+        },
+        {
+          "ms": 6728.792,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6728.886,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Proxy connection closed: peer disconnected"
+        },
+        {
+          "ms": 6728.956,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 6729.011,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 6729.165,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_fault_injector",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "scenario": "tcp-delay-ack",
+      "passed": true
+    },
+    {
+      "sender_exit": 1,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "duplicate_count": 0,
+      "receiver_ack_count": 0,
+      "forwarded_ack_count": 0,
+      "heartbeat_acks": [],
+      "error": "Sender error: peer disconnected",
+      "receiver_error": "Receiver error: CRC mismatch",
+      "receiver_survived": false,
+      "reconnected": false,
+      "events": [
+        {
+          "ms": 0.011,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.339,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.416,
+          "actor": "command",
+          "message": "tcp_fault_injector corrupt-data"
+        },
+        {
+          "ms": 14.972,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector listening on port 5000"
+        },
+        {
+          "ms": 14.985,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault mode: corrupt-data"
+        },
+        {
+          "ms": 22.991,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 26.735,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 26.791,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 26.896,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 26.956,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 26.982,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[CORRUPT] DATA seq=1"
+        },
+        {
+          "ms": 27.008,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 49.175,
+          "actor": "tcp_receiver.stderr",
+          "message": "Receiver error: CRC mismatch"
+        },
+        {
+          "ms": 49.569,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Proxy connection closed: peer disconnected"
+        },
+        {
+          "ms": 49.61,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 49.657,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: peer disconnected"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": 1,
+          "external_cleanup": false
+        },
+        {
+          "process": "tcp_fault_injector",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "scenario": "tcp-corrupt-data",
+      "passed": true
+    },
+    {
+      "sender_exit": 0,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "duplicate_count": 0,
+      "receiver_ack_count": 1,
+      "forwarded_ack_count": 1,
+      "heartbeat_acks": [
+        2,
+        3,
+        4
+      ],
+      "error": "",
+      "receiver_error": "",
+      "receiver_survived": true,
+      "reconnected": true,
+      "events": [
+        {
+          "ms": 0.012,
+          "actor": "command",
+          "message": "tcp_receiver"
+        },
+        {
+          "ms": 3.86,
+          "actor": "tcp_receiver.stdout",
+          "message": "Receiver listening on port 5001"
+        },
+        {
+          "ms": 11.623,
+          "actor": "command",
+          "message": "tcp_fault_injector disconnect"
+        },
+        {
+          "ms": 15.225,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector listening on port 5000"
+        },
+        {
+          "ms": 15.24,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault mode: disconnect"
+        },
+        {
+          "ms": 22.927,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 26.355,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 26.4,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 26.501,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 26.545,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received DATA seq=1 payload=hello embedded"
+        },
+        {
+          "ms": 26.566,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 26.614,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 26.636,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] DATA seq=1"
+        },
+        {
+          "ms": 26.664,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 26.692,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] ACK seq=1"
+        },
+        {
+          "ms": 26.718,
+          "actor": "tcp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 2026.858,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=2 count=1"
+        },
+        {
+          "ms": 2026.947,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[DISCONNECT] HEARTBEAT seq=2"
+        },
+        {
+          "ms": 2026.958,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Proxy connection closed: forced disconnect injected"
+        },
+        {
+          "ms": 2026.961,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 2026.995,
+          "actor": "tcp_sender.stdout",
+          "message": "Connection lost during HEARTBEAT seq=2 error=peer disconnected"
+        },
+        {
+          "ms": 2027.019,
+          "actor": "tcp_sender.stdout",
+          "message": "Reconnecting..."
+        },
+        {
+          "ms": 2027.059,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 2027.069,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        },
+        {
+          "ms": 2027.165,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 2027.192,
+          "actor": "tcp_sender.stdout",
+          "message": "Resent HEARTBEAT seq=2"
+        },
+        {
+          "ms": 2027.212,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Sender connected to Fault Injector"
+        },
+        {
+          "ms": 2027.313,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Fault Injector connected to Receiver"
+        },
+        {
+          "ms": 2027.321,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=2"
+        },
+        {
+          "ms": 2027.359,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender connected"
+        },
+        {
+          "ms": 2027.368,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=2"
+        },
+        {
+          "ms": 2027.412,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 2027.456,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 2027.633,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=2"
+        },
+        {
+          "ms": 4027.971,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=3 count=2"
+        },
+        {
+          "ms": 4028.058,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=3"
+        },
+        {
+          "ms": 4028.096,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 4028.145,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=3"
+        },
+        {
+          "ms": 4028.186,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 4028.213,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=3"
+        },
+        {
+          "ms": 6028.508,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Sender -> Receiver] HEARTBEAT seq=4"
+        },
+        {
+          "ms": 6028.562,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent HEARTBEAT seq=4 count=3"
+        },
+        {
+          "ms": 6028.622,
+          "actor": "tcp_receiver.stdout",
+          "message": "Received HEARTBEAT seq=4"
+        },
+        {
+          "ms": 6028.69,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "[Receiver -> Sender] HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6028.741,
+          "actor": "tcp_sender.stdout",
+          "message": "Received HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6028.777,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sent HEARTBEAT_ACK seq=4"
+        },
+        {
+          "ms": 6028.829,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Proxy connection closed: peer disconnected"
+        },
+        {
+          "ms": 6028.844,
+          "actor": "tcp_fault_injector.stdout",
+          "message": "Waiting for next Sender connection"
+        },
+        {
+          "ms": 6028.887,
+          "actor": "tcp_receiver.stdout",
+          "message": "Sender disconnected"
+        },
+        {
+          "ms": 6028.932,
+          "actor": "tcp_receiver.stdout",
+          "message": "Waiting for connection"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_receiver",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_fault_injector",
+          "exit_code": -15,
+          "external_cleanup": true
+        },
+        {
+          "process": "tcp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "scenario": "tcp-disconnect",
+      "passed": true
+    },
+    {
+      "sender_exit": 0,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1
+      ],
+      "ack_sequences": [
+        1
+      ],
+      "timeout_count": 0,
+      "retry_count": 0,
+      "duplicate_count": 0,
+      "ack3_generated": false,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.226,
+          "actor": "command",
+          "message": "udp_receiver_port6001"
+        },
+        {
+          "ms": 4.301,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 11.774,
+          "actor": "command",
+          "message": "udp_sender"
+        },
+        {
+          "ms": 15.574,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 15.714,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello udp"
+        },
+        {
+          "ms": 15.776,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=hello udp"
+        },
+        {
+          "ms": 15.83,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 15.873,
+          "actor": "relay",
+          "message": "ACK seq=1 forwarded unchanged"
+        },
+        {
+          "ms": 15.895,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 15.96,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=1"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "scenario": "udp-normal",
+      "passed": true
+    },
+    {
+      "sender_exit": 0,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1,
+        1
+      ],
+      "ack_sequences": [
+        1
+      ],
+      "timeout_count": 1,
+      "retry_count": 1,
+      "duplicate_count": 1,
+      "ack3_generated": false,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.209,
+          "actor": "command",
+          "message": "udp_receiver_port6001 drop-first-ack"
+        },
+        {
+          "ms": 3.832,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 3.843,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Test mode: drop-first-ack"
+        },
+        {
+          "ms": 12.001,
+          "actor": "command",
+          "message": "udp_sender"
+        },
+        {
+          "ms": 29.731,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 29.806,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello udp"
+        },
+        {
+          "ms": 29.871,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=hello udp"
+        },
+        {
+          "ms": 29.877,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "ACK intentionally dropped seq=1"
+        },
+        {
+          "ms": 1031.036,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 1031.083,
+          "actor": "udp_sender.stdout",
+          "message": "ACK timeout seq=1"
+        },
+        {
+          "ms": 1031.099,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=2 payload=hello udp"
+        },
+        {
+          "ms": 1031.161,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Duplicate DATA seq=1 ignored"
+        },
+        {
+          "ms": 1031.192,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 1031.224,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 1031.234,
+          "actor": "relay",
+          "message": "ACK seq=1 forwarded unchanged"
+        },
+        {
+          "ms": 1031.315,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=1"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "scenario": "udp-internal-drop",
+      "passed": true
+    },
+    {
+      "sender_exit": 0,
+      "receiver_natural_exit": 0,
+      "data_sequences": [
+        1,
+        3,
+        2
+      ],
+      "ack_sequences": [
+        1,
+        3,
+        2
+      ],
+      "timeout_count": 0,
+      "retry_count": 0,
+      "duplicate_count": 0,
+      "ack3_generated": true,
+      "error": "",
+      "events": [
+        {
+          "ms": 0.062,
+          "actor": "command",
+          "message": "udp_receiver_port6001 out-of-order"
+        },
+        {
+          "ms": 5.552,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "UDP Receiver listening on port 6001"
+        },
+        {
+          "ms": 5.571,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 12.32,
+          "actor": "command",
+          "message": "udp_sender out-of-order"
+        },
+        {
+          "ms": 17.222,
+          "actor": "relay",
+          "message": "DATA seq=1; receiver_exit=None"
+        },
+        {
+          "ms": 17.267,
+          "actor": "udp_sender.stdout",
+          "message": "Test mode: out-of-order"
+        },
+        {
+          "ms": 17.283,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=message-1"
+        },
+        {
+          "ms": 17.385,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=1 payload=message-1"
+        },
+        {
+          "ms": 17.433,
+          "actor": "relay",
+          "message": "valid ACK seq=1 received hex=aa55010200000001000000001ca98178"
+        },
+        {
+          "ms": 17.47,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=1"
+        },
+        {
+          "ms": 17.514,
+          "actor": "relay",
+          "message": "ACK seq=1 forwarded unchanged"
+        },
+        {
+          "ms": 17.605,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=1"
+        },
+        {
+          "ms": 17.644,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=3 attempt=1 payload=message-3"
+        },
+        {
+          "ms": 17.68,
+          "actor": "relay",
+          "message": "DATA seq=3; receiver_exit=None"
+        },
+        {
+          "ms": 17.78,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Out-of-order DATA seq=3 expected=2"
+        },
+        {
+          "ms": 17.784,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=3 payload=message-3"
+        },
+        {
+          "ms": 17.813,
+          "actor": "relay",
+          "message": "valid ACK seq=3 received hex=aa55010200000003000000006669d218"
+        },
+        {
+          "ms": 17.826,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=3"
+        },
+        {
+          "ms": 17.847,
+          "actor": "relay",
+          "message": "ACK seq=3 forwarded unchanged"
+        },
+        {
+          "ms": 17.922,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=3"
+        },
+        {
+          "ms": 17.968,
+          "actor": "relay",
+          "message": "DATA seq=2; receiver_exit=None"
+        },
+        {
+          "ms": 18.023,
+          "actor": "udp_sender.stdout",
+          "message": "Sent DATA seq=2 attempt=1 payload=message-2"
+        },
+        {
+          "ms": 18.098,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Received DATA seq=2 payload=message-2"
+        },
+        {
+          "ms": 18.129,
+          "actor": "relay",
+          "message": "valid ACK seq=2 received hex=aa55010200000002000000005b09fba8"
+        },
+        {
+          "ms": 18.168,
+          "actor": "udp_receiver_port6001.stdout",
+          "message": "Sent ACK seq=2"
+        },
+        {
+          "ms": 18.184,
+          "actor": "relay",
+          "message": "ACK seq=2 forwarded unchanged"
+        },
+        {
+          "ms": 18.239,
+          "actor": "udp_sender.stdout",
+          "message": "Received ACK seq=2"
+        }
+      ],
+      "exits": [
+        {
+          "process": "udp_receiver_port6001",
+          "exit_code": 0,
+          "external_cleanup": false
+        },
+        {
+          "process": "udp_sender",
+          "exit_code": 0,
+          "external_cleanup": false
+        }
+      ],
+      "scenario": "udp-order",
+      "passed": true
+    }
+  ],
+  "passed": 8,
+  "total": 8
+}

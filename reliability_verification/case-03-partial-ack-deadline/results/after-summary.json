@@ -1,0 +1,429 @@
+{
+  "schema_version": 1,
+  "phase": "after",
+  "configured_timeout_ms": 1000,
+  "timing_tolerance_ms": [
+    900,
+    1250
+  ],
+  "source_sha256": {
+    "tcp/receiver.cpp": "4b9dafc23361c2bc4451b8e9aea50e3980e199a73fb4fac183f938b5ab0bc5e2",
+    "tcp/sender.cpp": "2cea78217de0eb9402dc37cc640f855f7aac43bc2ae6bd3085e21bae44be3b2f",
+    "udp/receiver.cpp": "975ace94f846fb8dfc6ff55096fc99c3f348ffd063167a31c4d073c0086c8e92",
+    "udp/sender.cpp": "d1d1c440a01846a7ad1972621b13a2b1dc53060c42fe2af61d9040a7197e062c",
+    "protocol/codec.cpp": "e99a7bd688939ce757242e89db3bc533951a53b89fd18e62f0e99381f5c6dc5b",
+    "protocol/codec.hpp": "f6af4ea8afa2958d29ce9e7f02284322790a241d1e5c7c8cdbd2ff07a0f63f7e",
+    "protocol/crc32.cpp": "00589f12e508a856935d4e9ec56605fc2feb41f60bd968f1dcca8892a3423fc9",
+    "protocol/crc32.hpp": "40bf9f606057829fc7991be11021badda245a830eb725dc52d4bc29910bfa276",
+    "protocol/packet.hpp": "906096e815f7fb95886ad78565cd153967862d73d3ad4a763ee7fc414f8c2ddf",
+    "fault_injector/tcp_proxy.cpp": "a63cda3d6ecb64484b20686c70b4c8b0a7cf1ec47f38419944ace17e8e308365"
+  },
+  "harness_sha256": "bfe462f50467491157d663f4aefbaa01e15c94600e469cfe32aa063480dde2e1",
+  "baseline_tag": "v1.0.0",
+  "repetitions": 3,
+  "case": "case-03-partial-ack-deadline",
+  "runs": [
+    {
+      "mode": "complete-late",
+      "response_outcome_ms": 1001.439,
+      "observation_limit_ms": 3200.0,
+      "natural_exit": 1,
+      "alive_at_observation_end": false,
+      "connection_discarded": true,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "Sender error: partial response deadline exceeded; connection discarded",
+      "events": [
+        {
+          "ms": 0.075,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 4.218,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 4.276,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 4.288,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 84.443,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 1005.727,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: partial response deadline exceeded; connection discarded"
+        },
+        {
+          "ms": 1008.601,
+          "actor": "peer",
+          "message": "connection discarded EOF=True"
+        },
+        {
+          "ms": 3204.513,
+          "actor": "peer",
+          "message": "remaining ACK bytes send attempted at 3200ms"
+        },
+        {
+          "ms": 3204.54,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=1"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 1,
+      "variant": "complete-late",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "never-complete",
+      "response_outcome_ms": 1001.427,
+      "observation_limit_ms": 6000.0,
+      "natural_exit": 1,
+      "alive_at_observation_end": false,
+      "connection_discarded": true,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "Sender error: partial response deadline exceeded; connection discarded",
+      "events": [
+        {
+          "ms": 0.073,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 5.817,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 5.871,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 5.904,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 86.071,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 1007.331,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: partial response deadline exceeded; connection discarded"
+        },
+        {
+          "ms": 1010.6,
+          "actor": "peer",
+          "message": "connection discarded EOF=True"
+        },
+        {
+          "ms": 1010.614,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=1"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 1,
+      "variant": "never-complete",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "complete-late",
+      "response_outcome_ms": 1001.531,
+      "observation_limit_ms": 3200.0,
+      "natural_exit": 1,
+      "alive_at_observation_end": false,
+      "connection_discarded": true,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "Sender error: partial response deadline exceeded; connection discarded",
+      "events": [
+        {
+          "ms": 0.116,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 4.661,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 4.722,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 4.735,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 84.895,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 1006.266,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: partial response deadline exceeded; connection discarded"
+        },
+        {
+          "ms": 1009.084,
+          "actor": "peer",
+          "message": "connection discarded EOF=True"
+        },
+        {
+          "ms": 3204.855,
+          "actor": "peer",
+          "message": "remaining ACK bytes send attempted at 3200ms"
+        },
+        {
+          "ms": 3204.872,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=1"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 2,
+      "variant": "complete-late",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "never-complete",
+      "response_outcome_ms": 1001.603,
+      "observation_limit_ms": 6000.0,
+      "natural_exit": 1,
+      "alive_at_observation_end": false,
+      "connection_discarded": true,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "Sender error: partial response deadline exceeded; connection discarded",
+      "events": [
+        {
+          "ms": 0.059,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 92.456,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 92.518,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 92.586,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 172.813,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 1094.121,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: partial response deadline exceeded; connection discarded"
+        },
+        {
+          "ms": 1096.972,
+          "actor": "peer",
+          "message": "connection discarded EOF=True"
+        },
+        {
+          "ms": 1096.988,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=1"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 2,
+      "variant": "never-complete",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "complete-late",
+      "response_outcome_ms": 1001.675,
+      "observation_limit_ms": 3200.0,
+      "natural_exit": 1,
+      "alive_at_observation_end": false,
+      "connection_discarded": true,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "Sender error: partial response deadline exceeded; connection discarded",
+      "events": [
+        {
+          "ms": 0.058,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 5.097,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 5.138,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 5.182,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 85.454,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 1006.813,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: partial response deadline exceeded; connection discarded"
+        },
+        {
+          "ms": 1009.981,
+          "actor": "peer",
+          "message": "connection discarded EOF=True"
+        },
+        {
+          "ms": 3205.379,
+          "actor": "peer",
+          "message": "remaining ACK bytes send attempted at 3200ms"
+        },
+        {
+          "ms": 3205.41,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=1"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 3,
+      "variant": "complete-late",
+      "matched_expected_behavior": true
+    },
+    {
+      "mode": "never-complete",
+      "response_outcome_ms": 1001.503,
+      "observation_limit_ms": 6000.0,
+      "natural_exit": 1,
+      "alive_at_observation_end": false,
+      "connection_discarded": true,
+      "data_ack": false,
+      "timeout_count": 0,
+      "retry_count": 0,
+      "error": "Sender error: partial response deadline exceeded; connection discarded",
+      "events": [
+        {
+          "ms": 0.061,
+          "actor": "command",
+          "message": "tcp_sender"
+        },
+        {
+          "ms": 4.07,
+          "actor": "tcp_sender.stdout",
+          "message": "Connected to receiver attempt=1"
+        },
+        {
+          "ms": 4.148,
+          "actor": "tcp_sender.stdout",
+          "message": "Sent DATA seq=1 attempt=1 payload=hello embedded"
+        },
+        {
+          "ms": 4.2,
+          "actor": "peer",
+          "message": "DATA seq=1 received"
+        },
+        {
+          "ms": 84.41,
+          "actor": "peer",
+          "message": "ACK first byte sent"
+        },
+        {
+          "ms": 1005.651,
+          "actor": "tcp_sender.stderr",
+          "message": "Sender error: partial response deadline exceeded; connection discarded"
+        },
+        {
+          "ms": 1008.862,
+          "actor": "peer",
+          "message": "connection discarded EOF=True"
+        },
+        {
+          "ms": 1008.874,
+          "actor": "observer",
+          "message": "observation end: alive=False; natural_exit=1"
+        }
+      ],
+      "exits": [
+        {
+          "process": "tcp_sender",
+          "exit_code": 1,
+          "external_cleanup": false
+        }
+      ],
+      "run": 3,
+      "variant": "never-complete",
+      "matched_expected_behavior": true
+    }
+  ],
+  "matched": 6,
+  "total": 6,
+  "verdict": "PASS"
+}

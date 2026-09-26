@@ -86,13 +86,9 @@ std::vector<uint8_t> recv_exact(int fd, std::size_t size)
         }
 
         if (received == 0) {
-            if (total_received == 0) {
-                throw PeerDisconnected();
-            }
-
-            throw std::runtime_error(
-                "peer disconnected during packet receive"
-            );
+            // EOF is connection-local even after a partial header or payload.
+            // receive_packet() never returns, so no DATA processing or ACK occurs.
+            throw PeerDisconnected();
         }
 
         total_received += static_cast<std::size_t>(received);

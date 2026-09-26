@@ -12,6 +12,8 @@
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
+#include <set>
+#include <utility>
 #include <string>
 #include <thread>
 #include <vector>
@@ -68,35 +70,68 @@ void send_all(int fd, const void* data, std::size_t size)
     }
 }
 
-std::vector<uint8_t> recv_exact(int fd, std::size_t size)
+using Deadline = std::chrono::steady_clock::time_point;
+using CompletedResponses = std::set<std::pair<protocol::MessageType, uint32_t>>;
+
+class ResponseTimeout {};
+
+std::vector<uint8_t> recv_exact(
+    int fd, std::size_t size, Deadline deadline, std::size_t& frame_bytes)
 {
     std::vector<uint8_t> buffer(size);
     std::size_t total_received = 0;
 
     while (total_received < size) {
-        ssize_t received = recv(
-            fd, buffer.data() + total_received, size - total_received, 0);
+        const auto remaining = deadline - std::chrono::steady_clock::now();
+        if (remaining <= Deadline::duration::zero()) {
+            throw ResponseTimeout();
+        }
 
-        if (received < 0) {
+        pollfd pfd{};
+        pfd.fd = fd;
+        pfd.events = POLLIN;
+        const int timeout_ms = static_cast<int>(
+            std::chrono::ceil<std::chrono::milliseconds>(remaining).count());
+        const int result = poll(&pfd, 1, timeout_ms);
+        if (result < 0) {
             if (errno == EINTR) {
+                continue; // Recompute remaining time; never restart the deadline.
+            }
+            throw std::runtime_error(
+                std::string("poll failed: ") + std::strerror(errno));
+        }
+        if (result == 0) {
+            throw ResponseTimeout();
+        }
+        if (pfd.revents & (POLLERR | POLLNVAL)) {
+            throw ConnectionLost("connection error while waiting for response");
+        }
+        if (!(pfd.revents & POLLIN)) {
+            if (pfd.revents & POLLHUP) {
+                throw ConnectionLost("peer disconnected");
+            }
+            continue;
+        }
+
+        const ssize_t received = recv(
+            fd, buffer.data() + total_received, size - total_received,
+            MSG_DONTWAIT);
+        if (received < 0) {
+            if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK) {
                 continue;
             }
-
             if (errno == ECONNRESET) {
                 throw ConnectionLost(std::strerror(errno));
             }
-
             throw std::runtime_error(
                 std::string("recv failed: ") + std::strerror(errno));
         }
-
         if (received == 0) {
             throw ConnectionLost("peer disconnected");
         }
-
         total_received += static_cast<std::size_t>(received);
+        frame_bytes += static_cast<std::size_t>(received);
     }
-
     return buffer;
 }
 
@@ -106,15 +141,15 @@ void send_packet(int fd, const protocol::Packet& packet)
     send_all(fd, encoded.data(), encoded.size());
 }
 
-protocol::Packet receive_packet(int fd)
+protocol::Packet receive_packet(
+    int fd, Deadline deadline, std::size_t& frame_bytes)
 {
-    std::vector<uint8_t> header = recv_exact(fd, protocol::kHeaderSize);
-
+    std::vector<uint8_t> header =
+        recv_exact(fd, protocol::kHeaderSize, deadline, frame_bytes);
     uint32_t payload_length =
         protocol::get_payload_length(header.data(), header.size());
-
-    std::vector<uint8_t> payload = recv_exact(fd, payload_length);
-
+    std::vector<uint8_t> payload =
+        recv_exact(fd, payload_length, deadline, frame_bytes);
     return protocol::decode_packet(
         header.data(), header.size(), payload.data(), payload.size());
 }
@@ -123,49 +158,48 @@ bool wait_for_response(
     int fd,
     protocol::MessageType expected_type,
     uint32_t expected_sequence,
-    int timeout_ms)
+    int timeout_ms,
+    CompletedResponses& completed)
 {
-    pollfd pfd{};
-    pfd.fd = fd;
-    pfd.events = POLLIN;
-
-    int result;
-
-    do {
-        result = poll(&pfd, 1, timeout_ms);
-    } while (result < 0 && errno == EINTR);
-
-    if (result < 0) {
-        throw std::runtime_error(
-            std::string("poll failed: ") + std::strerror(errno));
-    }
-
-    if (result == 0) {
-        return false;
-    }
-
-    if (pfd.revents & (POLLERR | POLLNVAL)) {
-        throw ConnectionLost("connection error while waiting for response");
-    }
-
-    if (pfd.revents & POLLIN) {
-        protocol::Packet response = receive_packet(fd);
-
-        if (response.type != expected_type) {
-            throw std::runtime_error("unexpected response type");
+    const auto deadline = std::chrono::steady_clock::now()
+        + std::chrono::milliseconds(timeout_ms);
+    while (std::chrono::steady_clock::now() < deadline) {
+        std::size_t frame_bytes = 0;
+        protocol::Packet response;
+        try {
+            response = receive_packet(fd, deadline, frame_bytes);
         }
-
-        if (response.sequence != expected_sequence) {
-            throw std::runtime_error("response sequence mismatch");
+        catch (const ResponseTimeout&) {
+            if (frame_bytes != 0) {
+                // Discard a truncated frame's connection; retrying on this stream
+                // would interpret the remaining bytes as a new header.
+                shutdown(fd, SHUT_RDWR);
+                close(fd);
+                throw std::runtime_error(
+                    "partial response deadline exceeded; connection discarded");
+            }
+            return false; // At a frame boundary, same-connection retry is safe.
         }
-
-        return true;
+        if (std::chrono::steady_clock::now() >= deadline) {
+            return false; // A complete frame was consumed, but arrived too late.
+        }
+        if ((response.type != protocol::MessageType::Ack &&
+             response.type != protocol::MessageType::HeartbeatAck) ||
+            !response.payload.empty()) {
+            throw std::runtime_error("invalid response packet");
+        }
+        if (response.type == expected_type &&
+            response.sequence == expected_sequence) {
+            completed.emplace(response.type, response.sequence);
+            return true;
+        }
+        if (completed.count({response.type, response.sequence}) != 0) {
+            std::cout << "Ignored stale response seq="
+                      << response.sequence << '\n';
+            continue; // Same absolute deadline, even for many stale responses.
+        }
+        throw std::runtime_error("unexpected response type or sequence");
     }
-
-    if (pfd.revents & POLLHUP) {
-        throw ConnectionLost("peer disconnected");
-    }
-
     return false;
 }
 
@@ -239,6 +273,7 @@ int main()
 {
     try {
         int fd = connect_with_retry();
+        CompletedResponses completed_responses;
 
         std::string message = "hello embedded";
 
@@ -264,7 +299,7 @@ int main()
                     fd,
                     protocol::MessageType::Ack,
                     data_packet.sequence,
-                    kAckTimeoutMs)) {
+                    kAckTimeoutMs, completed_responses)) {
 
                 std::cout
                     << "Received ACK"
@@ -312,7 +347,7 @@ int main()
                         fd,
                         protocol::MessageType::HeartbeatAck,
                         heartbeat.sequence,
-                        kHeartbeatTimeoutMs)) {
+                        kHeartbeatTimeoutMs, completed_responses)) {
 
                     std::cout
                         << "HEARTBEAT timeout"
@@ -350,7 +385,7 @@ int main()
                         fd,
                         protocol::MessageType::HeartbeatAck,
                         heartbeat.sequence,
-                        kHeartbeatTimeoutMs)) {
+                        kHeartbeatTimeoutMs, completed_responses)) {
 
                     throw std::runtime_error(
                         "heartbeat failed after reconnect");
